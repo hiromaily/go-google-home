@@ -38,13 +38,13 @@ if *server {
 
 
 #### About options in cmd/main.go
-| Options        |                                          | Type   | Example        |
-| ------------- | ----------------------------------------- | -------| -------------- |
-| msg           | Message to Google Home                    | string | "Hello world!" |
-| lang          | Language to speak                         | string | en             |
-| server        | Run by server mode                        | bool   | none           |
-| port          | Web Server port                           | int    | 8080           |
-| log           | Log level, `1` display even debug message | int    | 1              |
+| Options        |                                           | Type   | Example        |
+| ------------- | ------------------------------------------ | -------| -------------- |
+| msg           | Message to Google Home                     | string | "Hello world!" |
+| lang          | Language to speak                          | string | en             |
+| server        | Run by server mode                         | bool   | none           |
+| port          | Web Server port                            | int    | 8080           |
+| log           | Log level, `1` displays even debug message | int    | 1              |
 
 #### Execution example
 ```
@@ -56,21 +56,33 @@ $ go build -i -race -v -o ${GOPATH}/bin/gh ./cmd/
 $ gh -msg "Thank you." -lang en
 
 # Sample for saying something in Japanese.
-$ gh  -msg "ありがとうございます" -lang ja
+$ gh -msg "ありがとうございます" -lang ja
 
 # Sample for saying something in French.
 $ gh -msg "Merci." -lang fr
 
 # Sample for saying something in German.
-$ gh  -msg "Danke." -lang de
+$ gh -msg "Danke." -lang de
 
 
 # Sample for saying something in English with `debug` log.
-$ gh  -msg "This displays debug log." -log 1
+$ gh -msg "This displays debug log." -log 1
 
 # Sample for server mode.
 $ gh -server
 
 # Sample to post message to server by HTTPie
 $ http POST http://localhost:8080/speak text="It's sunny day today."
+```
+
+## How to access to local server from outside
+Use [Ngrok](https://github.com/inconshreveable/ngrok)
+
+#### Install on Mac
+```
+$ brew cask install ngrok
+```
+```
+# If you use 8080 port for that local server.
+$ ngrok http 8080
 ```
