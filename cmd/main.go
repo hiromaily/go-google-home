@@ -8,20 +8,26 @@ import (
 )
 
 var (
-	message = flag.String("msg", "Please type message as option.", "Message to Google Home")
-	lang    = flag.String("lang", "en", "Language to speak")
-	server  = flag.Bool("server", false, "Run by server mode")
+	message  = flag.String("msg", "", "Message to Google Home")
+	lang     = flag.String("lang", "en", "Language to speak")
+	server   = flag.Bool("server", false, "Run by server mode")
+	logLevel = flag.Int("log", 1, "Run by debug mode")
 )
 
 func init() {
 	flag.Parse()
 
 	//log
-	lg.InitializeLog(lg.DebugStatus, lg.LogOff, log.Lshortfile,
+	lg.InitializeLog(uint8(*logLevel), lg.LogOff, log.Lshortfile,
 		"[Google-Home]", "")
 }
 
 func main() {
+	if !*server && *message == "" {
+		lg.Error("Please type in msg option.")
+		return
+	}
+
 	// 1.discover Google Home
 	gh := gglh.DiscoverService()
 	if gh.Error != nil {
@@ -33,12 +39,18 @@ func main() {
 
 	// 2.create client
 	gh.NewClient()
-
-	// 3.speak something
 	defer gh.Close()
-	err := gh.Speak(*message, *lang)
-	if err != nil {
-		lg.Errorf("gh.Speak() error:%v", err)
+
+	// 3.server mode
+	if *server {
+
+	} else {
+		// 4.speak something
+		err := gh.Speak(*message, *lang)
+		if err != nil {
+			lg.Errorf("gh.Speak() error:%v", err)
+			return
+		}
 	}
 	//time.Sleep(5 * time.Second)
 }
