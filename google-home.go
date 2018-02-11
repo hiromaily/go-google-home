@@ -12,6 +12,7 @@ import (
 	"net"
 	ur "net/url"
 	"strings"
+	"time"
 )
 
 const (
@@ -38,8 +39,9 @@ const (
 
 type GoogleHome struct {
 	host   string
-	addrV4 net.IP
-	port   int
+	AddrV4 net.IP
+	Port   int
+	Error  error
 	Controller
 }
 
@@ -48,29 +50,66 @@ type Controller struct {
 	ctx    context.Context
 }
 
+func New(strIP string, port int) *GoogleHome {
+	ip := net.ParseIP(strIP)
+	gh := GoogleHome{AddrV4: ip, Port: port}
+	return &gh
+}
+
 func DiscoverService() *GoogleHome {
-	//TODO:timeout and return error
 	notifyService := make(chan *GoogleHome)
 
 	// Make a channel for results and start listening
-	entriesCh := make(chan *mdns.ServiceEntry, 4)
+	entriesCh := make(chan *mdns.ServiceEntry, 1)
+	//go func() {
+	//	for entry := range entriesCh {
+	//		lg.Info("Discovered Device.")
+	//		lg.Debugf("Name: %s", entry.Name)
+	//		lg.Debugf("Host: %s", entry.Host)
+	//		lg.Debugf("AddrV4: %v", entry.AddrV4)
+	//		lg.Debugf("Port: %d", entry.Port)
+	//		//lg.Debugf("Info: %s", entry.Info)
+	//		//lg.Debugf("InfoFields: %v", entry.InfoFields)
+	//		//lg.Debugf("TTL: %v", entry.TTL)
+	//
+	//		//e.g. Name: Google-Home-1234567890abcdefghijklmn._googlecast._tcp.local.
+	//		if strings.Contains(entry.Name, ghPrefix) {
+	//			gh := GoogleHome{host: entry.Host, AddrV4: entry.AddrV4, Port: entry.Port}
+	//			notifyService <- &gh
+	//
+	//			close(entriesCh)
+	//		}
+	//	}
+	//}()
+	var isDone bool
 	go func() {
-		for entry := range entriesCh {
-			lg.Info("Discovered Device.")
-			lg.Debugf("Name: %s", entry.Name)
-			lg.Debugf("Host: %s", entry.Host)
-			lg.Debugf("AddrV4: %v", entry.AddrV4)
-			lg.Debugf("Port: %d", entry.Port)
-			//lg.Debugf("Info: %s", entry.Info)
-			//lg.Debugf("InfoFields: %v", entry.InfoFields)
-			//lg.Debugf("TTL: %v", entry.TTL)
+		for {
+			select {
+			case entry := <-entriesCh:
+				lg.Info("Discovered Device.")
+				if isDone {
+					return
+				}
+				lg.Debugf("Name: %s", entry.Name)
+				lg.Debugf("Host: %s", entry.Host)
+				lg.Debugf("AddrV4: %v", entry.AddrV4)
+				lg.Debugf("Port: %d", entry.Port)
 
-			//e.g. Name: Google-Home-1234567890abcdefghijklmn._googlecast._tcp.local.
-			if strings.Contains(entry.Name, ghPrefix) {
-				gh := GoogleHome{host: entry.Host, addrV4: entry.AddrV4, port: entry.Port}
-				notifyService <- &gh
-
+				//e.g. Name: Google-Home-1234567890abcdefghijklmn._googlecast._tcp.local.
+				if strings.Contains(entry.Name, ghPrefix) {
+					isDone = true
+					gh := GoogleHome{host: entry.Host, AddrV4: entry.AddrV4, Port: entry.Port}
+					notifyService <- &gh
+					close(entriesCh)
+					return
+				}
+			case <-time.After(5 * time.Second):
+				isDone = true
 				close(entriesCh)
+
+				gh := GoogleHome{Error: fmt.Errorf("Timeout for discovering devices.")}
+				notifyService <- &gh
+				return
 			}
 		}
 	}()
@@ -91,13 +130,13 @@ func mdnsLookup(entriesCh chan *mdns.ServiceEntry) {
 
 func (g *GoogleHome) NewClient() error {
 	ctx := context.Background()
-	client := cast.NewClient(g.addrV4, g.port)
+	client := cast.NewClient(g.AddrV4, g.Port)
 	err := client.Connect(ctx)
 	if err != nil {
 		return err
 	}
 
-	lg.Infof("Connected to %v:%d", g.addrV4, g.port)
+	lg.Infof("Connected to %v:%d", g.AddrV4, g.Port)
 	g.Controller = Controller{client: client, ctx: ctx}
 	return nil
 }
