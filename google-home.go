@@ -21,22 +21,6 @@ const (
 	ghPrefix    = "Google-Home-"
 )
 
-//type ServiceEntry struct {
-//	Name       string
-//	Host       string
-//	AddrV4     net.IP
-//	AddrV6     net.IP
-//	Port       int
-//	Info       string
-//	InfoFields []string
-//	TTL        int
-//
-//	Addr net.IP // @Deprecated
-//
-//	hasTXT bool
-//	sent   bool
-//}
-
 type GoogleHome struct {
 	host   string
 	AddrV4 net.IP
@@ -61,28 +45,11 @@ func DiscoverService() *GoogleHome {
 
 	// Make a channel for results and start listening
 	entriesCh := make(chan *mdns.ServiceEntry, 1)
-	//go func() {
-	//	for entry := range entriesCh {
-	//		lg.Info("Discovered Device.")
-	//		lg.Debugf("Name: %s", entry.Name)
-	//		lg.Debugf("Host: %s", entry.Host)
-	//		lg.Debugf("AddrV4: %v", entry.AddrV4)
-	//		lg.Debugf("Port: %d", entry.Port)
-	//		//lg.Debugf("Info: %s", entry.Info)
-	//		//lg.Debugf("InfoFields: %v", entry.InfoFields)
-	//		//lg.Debugf("TTL: %v", entry.TTL)
-	//
-	//		//e.g. Name: Google-Home-1234567890abcdefghijklmn._googlecast._tcp.local.
-	//		if strings.Contains(entry.Name, ghPrefix) {
-	//			gh := GoogleHome{host: entry.Host, AddrV4: entry.AddrV4, Port: entry.Port}
-	//			notifyService <- &gh
-	//
-	//			close(entriesCh)
-	//		}
-	//	}
-	//}()
+
 	var isDone bool
 	go func() {
+		//	for entry := range entriesCh {
+		//	}
 		for {
 			select {
 			case entry := <-entriesCh:
@@ -96,7 +63,7 @@ func DiscoverService() *GoogleHome {
 				lg.Debugf("Port: %d", entry.Port)
 
 				//e.g. Name: Google-Home-1234567890abcdefghijklmn._googlecast._tcp.local.
-				if strings.Contains(entry.Name, ghPrefix) {
+				if strings.HasPrefix(entry.Name, ghPrefix) {
 					isDone = true
 					gh := GoogleHome{host: entry.Host, AddrV4: entry.AddrV4, Port: entry.Port}
 					notifyService <- &gh

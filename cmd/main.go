@@ -19,8 +19,8 @@ var (
 	message    = flag.String("msg", "", "Message to Google Home")
 	lang       = flag.String("lang", "en", "Language to speak")
 	server     = flag.Bool("server", false, "Run by server mode")
-	serverPort = flag.Int("port", 8080, "Server por")
-	logLevel   = flag.Int("log", 1, "Run by debug mode")
+	serverPort = flag.Int("port", 8080, "Server port")
+	logLevel   = flag.Int("log", 2, "Run by debug mode")
 )
 
 type GHServer struct {
@@ -35,7 +35,11 @@ func init() {
 	flag.Parse()
 
 	//log
-	lg.InitializeLog(uint8(*logLevel), lg.LogOff, log.Lshortfile,
+	var logFmt = log.Lshortfile
+	if *logLevel != 1 {
+		logFmt = 0
+	}
+	lg.InitializeLog(uint8(*logLevel), lg.LogOff, logFmt,
 		"[Google-Home]", "")
 }
 
@@ -101,7 +105,6 @@ func listen(gh *gglh.GoogleHome) {
 
 	srv.Shutdown(ctx)
 	lg.Info("Server gracefully stopped")
-
 }
 
 func (g *GHServer) handler() func(http.ResponseWriter, *http.Request) {
@@ -111,43 +114,42 @@ func (g *GHServer) handler() func(http.ResponseWriter, *http.Request) {
 			http.Error(w, "Method is not allowed.", http.StatusMethodNotAllowed)
 			return
 		}
-		//check parameter
-		r.ParseForm()
-		var said string
-		var err error
-		if v, ok := r.Form["text"]; ok {
-			said, err = g.speak(w, v[0])
-		} else {
-			//json
-			said, err = g.parseJson(w, r)
-		}
+		//check parameter in json
+		text, err := parseJson(w, r)
 		if err != nil {
 			return
 		}
-		lg.Infof("said: %s", said)
 
+		err = g.speak(w, text)
+		if err != nil {
+			return
+		}
+
+		lg.Infof("said: %s", text)
+
+		//response correctly
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, said)
+		fmt.Fprint(w, text)
 	}
 }
 
-func (g *GHServer) speak(w http.ResponseWriter, text string) (string, error) {
+func (g *GHServer) speak(w http.ResponseWriter, text string) error {
 	if text != "" {
 		err := g.Speak(text, *lang)
 		if err != nil {
 			http.Error(w, "It couldn't speak.", http.StatusInternalServerError)
 			lg.Errorf("gh.Speak() error:%v", err)
-			return "", err
+			return err
 		}
 	} else {
 		http.Error(w, "Parameter is invalid.", http.StatusBadRequest)
 		lg.Error("gh.Speak() error: text is blank")
-		return "", fmt.Errorf("Parameter is invalid.")
+		return fmt.Errorf("Parameter is invalid.")
 	}
-	return text, nil
+	return nil
 }
 
-func (g *GHServer) parseJson(w http.ResponseWriter, r *http.Request) (string, error) {
+func parseJson(w http.ResponseWriter, r *http.Request) (string, error) {
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -164,5 +166,5 @@ func (g *GHServer) parseJson(w http.ResponseWriter, r *http.Request) (string, er
 		return "", err
 	}
 
-	return g.speak(w, speak.Text)
+	return speak.Text, err
 }
