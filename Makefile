@@ -2,6 +2,12 @@
 build:
 	go build -i -race -v -o ${GOPATH}/bin/gh ./cmd/
 
+build-for-release:
+	go build -i -race -v -o ./releases/darwin_amd64/gh ./cmd/
+
+#build-linux:
+#	GOOS=linux go build -v -o ./releases/linux_amd64/gh ./cmd/
+
 
 # Sample for saying something in English.
 say-en:
