@@ -7,6 +7,7 @@ build-for-release:
 
 #build-linux:
 #	GOOS=linux go build -v -o ./releases/linux_amd64/gh ./cmd/
+#   GOOS=linux GOARCH=arm GOARM=5 go build -v -o ./releases/linux_amd64/gh ./cmd/
 
 
 # Sample for saying something in English.
