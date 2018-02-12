@@ -160,10 +160,14 @@ func (c *Controller) Stop() error {
 	return err
 }
 
-func (c *Controller) Quit() error {
-	receiver := c.client.Receiver()
-	_, err := receiver.QuitApp(c.ctx)
-	return err
+func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
+	media, err := c.client.Media(c.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	//*MediaStatusResponse, error
+	return media.GetStatus(c.ctx)
 }
 
 func (c *Controller) Close() {

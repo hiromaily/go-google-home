@@ -46,7 +46,7 @@ type Speak struct {
 	Text string `json:"text"`
 }
 
-var ssmlDir = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-google-home/ssml"
+//var ssmlDir = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-google-home/ssml"
 
 func init() {
 	flag.Usage = func() {
@@ -106,12 +106,19 @@ func main() {
 	if *server {
 		listen(gh)
 	} else {
-		// 4.speak something
+		// 5.speak something
 		err := gh.Speak(*message, *lang)
 		if err != nil {
 			lg.Errorf("gh.Speak() error:%v", err)
 			return
 		}
+		//　monitor status
+		status, err := gh.GetStatus()
+		if err != nil {
+			lg.Errorf("gh.GetStatus() error:%v", err)
+			return
+		}
+		fmt.Println(status)
 	}
 	//TODO: check status of google home it's done or not for playing.
 	time.Sleep(1 * time.Second)
