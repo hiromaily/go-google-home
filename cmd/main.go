@@ -19,12 +19,24 @@ import (
 
 var (
 	message    = flag.String("msg", "", "Message to Google Home")
-	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009")
+	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
 	server     = flag.Bool("server", false, "Run by server mode")
 	serverPort = flag.Int("port", 8080, "Server port")
-	logLevel   = flag.Int("log", 2, "Run by debug mode")
+	logLevel   = flag.Int("log", 2, "log level. `1`:debug mode")
 )
+
+var usage = `Usage: %s [options...]
+Options:
+  -msg    Message to Google Home.
+  -addr   Address of Google Home. [e.g.] 192.168.x.x:8009
+  -lang   Language to speak.      [e.g.] en, de, nl, fr, ja ...
+  -server Run by server mode.     [e.g.] $ gh -server
+  -port   Server port.
+  -log    Log level.              [e.g.] 1: debug log
+
+See Makefile for examples.
+`
 
 type GHServer struct {
 	*gglh.GoogleHome
@@ -37,6 +49,10 @@ type Speak struct {
 var ssmlDir = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-google-home/ssml"
 
 func init() {
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
+	}
+
 	flag.Parse()
 
 	//log
@@ -50,7 +66,10 @@ func init() {
 
 func main() {
 	if !*server && *message == "" {
-		lg.Error("Please type in msg option.")
+		//lg.Error("Please type in msg option.")
+		//return
+		flag.Usage()
+		os.Exit(1)
 		return
 	}
 
