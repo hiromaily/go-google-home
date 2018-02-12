@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	gglh "github.com/hiromaily/go-google-home"
@@ -46,8 +47,6 @@ type Speak struct {
 	Text string `json:"text"`
 }
 
-//var ssmlDir = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-google-home/ssml"
-
 func init() {
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
@@ -66,62 +65,76 @@ func init() {
 
 func main() {
 	if !*server && *message == "" {
-		//lg.Error("Please type in msg option.")
-		//return
 		flag.Usage()
 		os.Exit(1)
 		return
 	}
 
 	var gh *gglh.GoogleHome
+	var err error
+
 	if *address != "" {
-		// 1. use address if it exists.
-		addr := strings.Split(*address, ":")
-		if len(addr) != 2 {
-			lg.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
-			return
-		}
-		port, err := strconv.Atoi(addr[1])
+		// create object from address
+		gh, err = setAddress(*address)
 		if err != nil {
-			lg.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
+			lg.Error(err)
 			return
 		}
-		gh = gglh.New(addr[0], port)
 	} else {
-		// 2.discover Google Home
+		// discover Google Home
 		gh = gglh.DiscoverService()
 		if gh.Error != nil {
 			lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
 			return
 		}
-		// if you use specific address
-		//gh := gglh.New("192.168.178.164", 8009)
 	}
 
-	// 3.create client
+	// create client
 	gh.NewClient()
 	defer gh.Close()
 
-	// 4.server mode
+	// wait events
+	//go func(){
+	//	for evt := range gh.Client.Events {
+	//		fmt.Println("[Event received]", evt)
+	//	}
+	//}()
+
+	// server mode
 	if *server {
 		listen(gh)
-	} else {
-		// 5.speak something
-		err := gh.Speak(*message, *lang)
-		if err != nil {
-			lg.Errorf("gh.Speak() error:%v", err)
-			return
-		}
-		//　monitor status
-		status, err := gh.GetStatus()
-		if err != nil {
-			lg.Errorf("gh.GetStatus() error:%v", err)
-			return
-		}
-		fmt.Println(status)
+		return
+	}
+
+	// speak something
+	err = gh.Speak(*message, *lang)
+	if err != nil {
+		lg.Errorf("gh.Speak() error:%v", err)
+		return
 	}
 	//TODO: check status of google home it's done or not for playing.
-	time.Sleep(1 * time.Second)
+	//　monitor status
+	// 	gh.Client.Events
+
+	//status, err := gh.GetStatus()
+	//if err != nil {
+	//	lg.Errorf("gh.GetStatus() error:%v", err)
+	//	return
+	//}
+	//fmt.Println(status)
+}
+
+func setAddress(address string) (*gglh.GoogleHome, error) {
+	// 1. use address if it exists.
+	addr := strings.Split(address, ":")
+	if len(addr) != 2 {
+		return nil, fmt.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
+	}
+	port, err := strconv.Atoi(addr[1])
+	if err != nil {
+		return nil, fmt.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
+	}
+	return gglh.New(addr[0], port), nil
 }
 
 func listen(gh *gglh.GoogleHome) {
@@ -133,7 +146,6 @@ func listen(gh *gglh.GoogleHome) {
 	ghs.GoogleHome = gh
 
 	http.HandleFunc("/speak", ghs.speakHandler())
-	//http.HandleFunc("/speak-ssml", ghs.ssmlHandler())
 	//http.Handle("/ssml/", http.StripPrefix("/ssml/", http.FileServer(http.Dir("./ssml"))))
 
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *serverPort), Handler: http.DefaultServeMux}

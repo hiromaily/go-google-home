@@ -31,7 +31,7 @@ type GoogleHome struct {
 }
 
 type Controller struct {
-	client *cast.Client
+	Client *cast.Client
 	ctx    context.Context
 }
 
@@ -105,7 +105,7 @@ func (g *GoogleHome) NewClient() error {
 	}
 
 	lg.Infof("Connected to %v:%d", g.AddrV4, g.Port)
-	g.Controller = Controller{client: client, ctx: ctx}
+	g.Controller = Controller{Client: client, ctx: ctx}
 	return nil
 }
 
@@ -114,12 +114,8 @@ func (c *Controller) Speak(text string, language string) error {
 	return c.Play(u)
 }
 
-//func (c *Controller) SpeakBySSML(url string) error {
-//	return c.PlaySSML(url)
-//}
-
 func (c *Controller) Play(url string) error {
-	media, err := c.client.Media(c.ctx)
+	media, err := c.Client.Media(c.ctx)
 	if err != nil {
 		return err
 	}
@@ -133,26 +129,11 @@ func (c *Controller) Play(url string) error {
 	return err
 }
 
-//func (c *Controller) PlaySSML(url string) error {
-//	media, err := c.client.Media(c.ctx)
-//	if err != nil {
-//		return err
-//	}
-//
-//	item := ctl.MediaItem{
-//		ContentId:   url,
-//		StreamType:  "BUFFERED",
-//		ContentType: "application/ssml+xml",
-//	}
-//	_, err = media.LoadMedia(c.ctx, item, 0, true, map[string]interface{}{})
-//	return err
-//}
-
 func (c *Controller) Stop() error {
-	if !c.client.IsPlaying(c.ctx) {
+	if !c.Client.IsPlaying(c.ctx) {
 		return nil
 	}
-	media, err := c.client.Media(c.ctx)
+	media, err := c.Client.Media(c.ctx)
 	if err != nil {
 		return err
 	}
@@ -161,7 +142,7 @@ func (c *Controller) Stop() error {
 }
 
 func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
-	media, err := c.client.Media(c.ctx)
+	media, err := c.Client.Media(c.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -171,5 +152,5 @@ func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
 }
 
 func (c *Controller) Close() {
-	c.client.Close()
+	c.Client.Close()
 }
