@@ -12,11 +12,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"time"
 )
 
 var (
 	message    = flag.String("msg", "", "Message to Google Home")
+	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009")
 	lang       = flag.String("lang", "en", "Language to speak")
 	server     = flag.Bool("server", false, "Run by server mode")
 	serverPort = flag.Int("port", 8080, "Server port")
@@ -30,6 +33,8 @@ type GHServer struct {
 type Speak struct {
 	Text string `json:"text"`
 }
+
+var ssmlDir = os.Getenv("GOPATH") + "/src/github.com/hiromaily/go-google-home/ssml"
 
 func init() {
 	flag.Parse()
@@ -49,20 +54,36 @@ func main() {
 		return
 	}
 
-	// 1.discover Google Home
-	gh := gglh.DiscoverService()
-	if gh.Error != nil {
-		lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
-		return
+	var gh *gglh.GoogleHome
+	if *address != "" {
+		// 1. use address if it exists.
+		addr := strings.Split(*address, ":")
+		if len(addr) != 2 {
+			lg.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
+			return
+		}
+		port, err := strconv.Atoi(addr[1])
+		if err != nil {
+			lg.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
+			return
+		}
+		gh = gglh.New(addr[0], port)
+	} else {
+		// 2.discover Google Home
+		gh = gglh.DiscoverService()
+		if gh.Error != nil {
+			lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
+			return
+		}
+		// if you use specific address
+		//gh := gglh.New("192.168.178.164", 8009)
 	}
-	// if you use specific address
-	//gh := gglh.New("192.168.178.164", 8009)
 
-	// 2.create client
+	// 3.create client
 	gh.NewClient()
 	defer gh.Close()
 
-	// 3.server mode
+	// 4.server mode
 	if *server {
 		listen(gh)
 	} else {
@@ -73,6 +94,7 @@ func main() {
 			return
 		}
 	}
+	//TODO: check status of google home it's done or not for playing.
 	time.Sleep(1 * time.Second)
 }
 
@@ -84,7 +106,10 @@ func listen(gh *gglh.GoogleHome) {
 	ghs := GHServer{}
 	ghs.GoogleHome = gh
 
-	http.HandleFunc("/speak", ghs.handler())
+	http.HandleFunc("/speak", ghs.speakHandler())
+	//http.HandleFunc("/speak-ssml", ghs.ssmlHandler())
+	//http.Handle("/ssml/", http.StripPrefix("/ssml/", http.FileServer(http.Dir("./ssml"))))
+
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *serverPort), Handler: http.DefaultServeMux}
 	lg.Infof("Server start with port %d ...", *serverPort)
 
@@ -107,7 +132,7 @@ func listen(gh *gglh.GoogleHome) {
 	lg.Info("Server gracefully stopped")
 }
 
-func (g *GHServer) handler() func(http.ResponseWriter, *http.Request) {
+func (g *GHServer) speakHandler() func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//check post or not
 		if r.Method != "POST" {
@@ -132,6 +157,22 @@ func (g *GHServer) handler() func(http.ResponseWriter, *http.Request) {
 		fmt.Fprint(w, text)
 	}
 }
+
+//func (g *GHServer) ssmlHandler() func(http.ResponseWriter, *http.Request) {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		//url
+//		url := "http://192.168.178.157:8080/ssml/sample.ssml"
+//		err := g.SpeakBySSML(url)
+//		if err != nil {
+//			http.Error(w, "It couldn't speak.", http.StatusInternalServerError)
+//			lg.Errorf("gh.Speak() error:%v", err)
+//			return
+//		}
+//
+//		w.WriteHeader(http.StatusOK)
+//		fmt.Fprint(w, 200)
+//	}
+//}
 
 func (g *GHServer) speak(w http.ResponseWriter, text string) error {
 	if text != "" {

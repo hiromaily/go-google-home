@@ -38,13 +38,14 @@ if *server {
 
 
 #### About options in cmd/main.go
-| Options        |                                           | Type   | Example        |
-| ------------- | ------------------------------------------ | -------| -------------- |
-| msg           | Message to Google Home                     | string | "Hello world!" |
-| lang          | Language to speak                          | string | en             |
-| server        | Run by server mode                         | bool   | none           |
-| port          | Web Server port                            | int    | 8080           |
-| log           | Log level, `1` displays even debug message | int    | 1              |
+| Options        |                                           | Type   | Example                 |
+| -------------- | ------------------------------------------ | -------| ---------------------- |
+| msg            | Message to Google Home                     | string | "Hello world!"         |
+| addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009" |
+| lang           | Language to speak                          | string | en                     |
+| server         | Run by server mode                         | bool   | none                   |
+| port           | Web Server port                            | int    | 8080                   |
+| log            | Log level, `1` displays even debug message | int    | 1                      |
 
 #### Execution example
 ```
@@ -67,6 +68,11 @@ $ gh -msg "Danke." -lang de
 
 # Sample for saying something in English with `debug` log.
 $ gh -msg "This displays debug log." -log 1
+
+
+# Sample for using specific IP address of Google Home.
+$ gh  -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
+
 
 # Sample for server mode.
 $ gh -server

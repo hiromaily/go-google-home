@@ -1,6 +1,7 @@
 package googlehome
 
 // Google Text to Speech API
+// https://www.w3.org/TR/speech-synthesis/
 
 import (
 	"context"
@@ -113,6 +114,10 @@ func (c *Controller) Speak(text string, language string) error {
 	return c.Play(u)
 }
 
+//func (c *Controller) SpeakBySSML(url string) error {
+//	return c.PlaySSML(url)
+//}
+
 func (c *Controller) Play(url string) error {
 	media, err := c.client.Media(c.ctx)
 	if err != nil {
@@ -127,6 +132,21 @@ func (c *Controller) Play(url string) error {
 	_, err = media.LoadMedia(c.ctx, item, 0, true, map[string]interface{}{})
 	return err
 }
+
+//func (c *Controller) PlaySSML(url string) error {
+//	media, err := c.client.Media(c.ctx)
+//	if err != nil {
+//		return err
+//	}
+//
+//	item := ctl.MediaItem{
+//		ContentId:   url,
+//		StreamType:  "BUFFERED",
+//		ContentType: "application/ssml+xml",
+//	}
+//	_, err = media.LoadMedia(c.ctx, item, 0, true, map[string]interface{}{})
+//	return err
+//}
 
 func (c *Controller) Stop() error {
 	if !c.client.IsPlaying(c.ctx) {
