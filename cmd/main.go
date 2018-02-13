@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	gglh "github.com/hiromaily/go-google-home"
@@ -93,12 +92,9 @@ func main() {
 	gh.NewClient()
 	defer gh.Close()
 
+	//TODO: check status of google home it's done or not for playing.
 	// wait events
-	//go func(){
-	//	for evt := range gh.Client.Events {
-	//		fmt.Println("[Event received]", evt)
-	//	}
-	//}()
+	gh.RunEventReceiver()
 
 	// server mode
 	if *server {
@@ -112,16 +108,21 @@ func main() {
 		lg.Errorf("gh.Speak() error:%v", err)
 		return
 	}
-	//TODO: check status of google home it's done or not for playing.
-	//　monitor status
-	// 	gh.Client.Events
 
+	//TODO: monitor status
 	//status, err := gh.GetStatus()
 	//if err != nil {
 	//	lg.Errorf("gh.GetStatus() error:%v", err)
 	//	return
+	//} else {
+	//	gh.DebugStatus(status)
 	//}
-	//fmt.Println(status)
+
+	//debug for event channel
+	//for {
+	//	fmt.Println("sleep")
+	//	time.Sleep(3 * time.Second)
+	//}
 }
 
 func setAddress(address string) (*gglh.GoogleHome, error) {
