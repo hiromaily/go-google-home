@@ -156,6 +156,7 @@ func (c *Controller) Close() {
 	c.Client.Close()
 }
 
+// It seems to be useless.
 func (c *Controller) RunEventReceiver() {
 	go func() {
 		for evt := range c.Client.Events {
@@ -166,6 +167,9 @@ func (c *Controller) RunEventReceiver() {
 				fmt.Println("ctl.MediaStatus")
 				if obj, ok := evt.(ctl.MediaStatus); ok {
 					fmt.Println(obj)
+					if obj.IdleReason == "FINISHED" {
+						//TODO: send something channel.
+					}
 				}
 			case ev.Connected:
 				fmt.Println("ev.Connected")
@@ -193,6 +197,10 @@ func (c *Controller) RunEventReceiver() {
 				//TODO: what is this event type??
 				//{CC1AD845 Default Media Receiver Ready To Cast}
 			}
+			//if c.Client.IsPlaying(c.ctx) {
+			//	fmt.Println("playing")
+			//}
+
 		}
 	}()
 }
