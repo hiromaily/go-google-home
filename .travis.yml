@@ -1,6 +1,10 @@
-sudo: false
 language: go
+sudo: false
+dist: trusty
 go:
     - tip
 install: true
-script: make release-all
+before_script:
+  - go get -u -d -v ./...
+script:
+  - make release-all
