@@ -47,6 +47,9 @@ if *server {
 | port           | Web Server port                            | int    | 8080                   |
 | log            | Log level, `1` displays even debug message | int    | 1                      |
 
+- Environment variable `GOOGLE_HOME_IP` is used for IP Address of GOOGLE HOME.
+
+
 #### Execution example
 ```
 # Build

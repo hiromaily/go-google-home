@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"github.com/barnybug/go-cast"
 	ctl "github.com/barnybug/go-cast/controllers"
-	ev "github.com/barnybug/go-cast/events"
+	//ev "github.com/barnybug/go-cast/events"
+	"github.com/bookerzzz/grok"
 	lg "github.com/hiromaily/golibs/log"
 	"github.com/micro/mdns"
 	"net"
@@ -157,46 +158,46 @@ func (c *Controller) Close() {
 }
 
 // It seems to be useless.
-func (c *Controller) RunEventReceiver() {
+func (c *Controller) RunEventReceiver(notify chan bool) {
 	go func() {
 		for evt := range c.Client.Events {
 			//TODO:evt is type of interface, it should be casted to something.
-			fmt.Println("[Event received]", evt)
+			//fmt.Println("[Event received]", evt)
 			switch evt.(type) {
 			case ctl.MediaStatus:
-				fmt.Println("ctl.MediaStatus")
 				if obj, ok := evt.(ctl.MediaStatus); ok {
-					fmt.Println(obj)
 					if obj.IdleReason == "FINISHED" {
-						//TODO: send something channel.
+						//fmt.Println("ctl.MediaStatus:FINISHED")
+						notify <- true
 					}
 				}
-			case ev.Connected:
-				fmt.Println("ev.Connected")
-				if obj, ok := evt.(ev.Connected); ok {
-					fmt.Println(obj)
-				}
-			case ev.Disconnected:
-				fmt.Println("ev.Disconnected")
-				if obj, ok := evt.(ev.Disconnected); ok {
-					fmt.Println(obj)
-				}
-			case ev.StatusUpdated:
-				fmt.Println("ev.StatusUpdated")
-				if obj, ok := evt.(ev.StatusUpdated); ok {
-					fmt.Println(obj)
-				}
-			//case ctl.MediaStatusResponse:
-			//	fmt.Println("OK!!")
-			//case ctl.ReceiverStatus:
-			//	fmt.Println("OK2!!")
-			//case ctl.StatusResponse:
-			//	fmt.Println("OK3!!")
-			default:
-				fmt.Println("default")
-				//TODO: what is this event type??
-				//{CC1AD845 Default Media Receiver Ready To Cast}
+
+				//case ev.Connected:
+				//	fmt.Println("ev.Connected")
+				//	if obj, ok := evt.(ev.Connected); ok {
+				//		fmt.Println(obj)
+				//	}
+				//case ev.Disconnected:
+				//	fmt.Println("ev.Disconnected")
+				//	if obj, ok := evt.(ev.Disconnected); ok {
+				//		fmt.Println(obj)
+				//	}
+				//case ev.StatusUpdated:
+				//	fmt.Println("ev.StatusUpdated")
+				//	if obj, ok := evt.(ev.StatusUpdated); ok {
+				//		fmt.Println(obj)
+				//	}
+
+				//case ctl.MediaStatusResponse:
+				//case ctl.ReceiverStatus:
+				//case ctl.StatusResponse:
+
+				//default:
+				//	fmt.Println("default")
+				//	//TODO: what is this event type??
+				//	//{CC1AD845 Default Media Receiver Ready To Cast}
 			}
+
 			//if c.Client.IsPlaying(c.ctx) {
 			//	fmt.Println("playing")
 			//}
@@ -206,36 +207,6 @@ func (c *Controller) RunEventReceiver() {
 }
 
 func (c *Controller) DebugStatus(status *ctl.MediaStatusResponse) {
-	//type MediaStatus struct {
-	//	net.PayloadHeaders
-	//	MediaSessionID         int                    `json:"mediaSessionId"`
-	//	PlaybackRate           float64                `json:"playbackRate"`
-	//	PlayerState            string                 `json:"playerState"`
-	//	CurrentTime            float64                `json:"currentTime"`
-	//	SupportedMediaCommands int                    `json:"supportedMediaCommands"`
-	//	Volume                 *Volume                `json:"volume,omitempty"`
-	//	Media                  *MediaStatusMedia      `json:"media"`
-	//	CustomData             map[string]interface{} `json:"customData"`
-	//	RepeatMode             string                 `json:"repeatMode"`
-	//	IdleReason             string                 `json:"idleReason"`
-	//}
-
-	fmt.Println("[status:length]", len(status.Status)) //1
-	fmt.Printf("[status[0]:obj] %#v\n", status.Status[0])
-	fmt.Println("[status[0].Type]", status.Status[0].Type)                           // none
-	fmt.Println("[status[0].RequestId]", status.Status[0].RequestId)                 // <nil>
-	fmt.Println("[status[0].CurrentTime]", status.Status[0].CurrentTime)             // 0
-	fmt.Println("[status[0].CustomData]", status.Status[0].CustomData)               // map[]
-	fmt.Println("[status[0].IdleReason]", status.Status[0].IdleReason)               // none
-	fmt.Println("[status[0].Media.ContentId]", status.Status[0].Media.ContentId)     // url for playing
-	fmt.Println("[status[0].Media.ContentType]", status.Status[0].Media.ContentType) // audio/mpeg
-	fmt.Println("[status[0].Media.Duration]", status.Status[0].Media.Duration)       // 0.96
-	fmt.Println("[status[0].Media.StreamType]", status.Status[0].Media.StreamType)   // BUFFERED
-
-	fmt.Println("[*status[0].Volume.Level]", *status.Status[0].Volume.Level)   // 1
-	fmt.Println("[status[0].PayloadHeaders]", status.Status[0].PayloadHeaders) //{ <nil>}
-
-	fmt.Println("[*status.RequestId]", *status.RequestId)                   //0xc42007ed68
-	fmt.Println("[status.Type]", status.Type)                               //MEDIA_STATUS
-	fmt.Println("[status.PayloadHeaders.Type]", status.PayloadHeaders.Type) //MEDIA_STATUS
+	fmt.Println("DebugStatus(): *ctl.MediaStatusResponse:status")
+	grok.Value(status)
 }

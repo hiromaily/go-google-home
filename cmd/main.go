@@ -14,12 +14,13 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	//"sync"
 	"time"
 )
 
 var (
 	message    = flag.String("msg", "", "Message to Google Home")
-	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
+	address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
 	server     = flag.Bool("server", false, "Run by server mode")
 	serverPort = flag.Int("port", 8080, "Server port")
@@ -63,6 +64,8 @@ func init() {
 }
 
 func main() {
+	//m := new(sync.Mutex)
+
 	if !*server && *message == "" {
 		flag.Usage()
 		os.Exit(1)
@@ -92,15 +95,15 @@ func main() {
 	gh.NewClient()
 	defer gh.Close()
 
-	//TODO: check status of google home it's done or not for playing.
-	// wait events
-	gh.RunEventReceiver()
-
 	// server mode
 	if *server {
 		listen(gh)
 		return
 	}
+
+	// wait events
+	finishNotification := make(chan bool)
+	gh.RunEventReceiver(finishNotification)
 
 	// speak something
 	err = gh.Speak(*message, *lang)
@@ -110,19 +113,20 @@ func main() {
 	}
 
 	//TODO: monitor status
-	//status, err := gh.GetStatus()
-	//if err != nil {
-	//	lg.Errorf("gh.GetStatus() error:%v", err)
-	//	return
-	//} else {
-	//	gh.DebugStatus(status)
-	//}
+	//TODO: it causes DATA RACE
+	//go func() {
+	//	status, err := gh.GetStatus()
+	//	if err != nil {
+	//		lg.Errorf("gh.GetStatus() error:%v", err)
+	//		return
+	//	} else {
+	//		m.Lock()
+	//		gh.DebugStatus(status)
+	//		m.Unlock()
+	//	}
+	//}()
 
-	//debug for event channel
-	//for {
-	//	fmt.Println("sleep")
-	//	time.Sleep(3 * time.Second)
-	//}
+	<-finishNotification
 }
 
 func setAddress(address string) (*gglh.GoogleHome, error) {
