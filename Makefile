@@ -2,14 +2,21 @@
 build:
 	go build -i -race -v -o ${GOPATH}/bin/gh ./cmd/
 
-build-for-release:
+build-mac: GOOS=darwin GOARCH=amd64
+build-mac:
 	go build -i -race -v -o ./releases/darwin_amd64/gh ./cmd/
 
-#build-linux:
-#	GOOS=linux go build -v -o ./releases/linux_amd64/gh ./cmd/
+build-linux: GOOS=linux
+build-linux:
+	#GOOS=linux go build -v -o ./releases/linux_amd64/gh ./cmd/
+	go build -v -o ./releases/linux_amd64/gh ./cmd/
 
-#build-linux-arm:
-#   GOOS=linux GOARCH=arm GOARM=5 go build -v -o ./releases/linux_arm/gh ./cmd/
+build-linux-arm: GOOS=linux GOARCH=arm GOARM=5
+build-linux-arm:
+	#GOOS=linux GOARCH=arm GOARM=5 go build -v -o ./releases/linux_arm/gh ./cmd/
+	go build -v -o ./releases/linux_arm/gh ./cmd/
+
+release-all: build-linux build-linux-arm build-mac
 
 
 # Sample for saying something in English.

@@ -1,0 +1,6 @@
+sudo: false
+language: go
+go:
+    - tip
+install: true
+script: make release-all
