@@ -14,19 +14,23 @@ build-for-release:
 
 # Sample for saying something in English.
 say-en:
-	gh -msg "Thank you." -lang en
+	gh -msg "Thank you."
 
 # Sample for saying something in Japanese.
 say-ja:
 	gh  -msg "ありがとうございます" -lang ja
 
-# Sample for saying something in French.
-say-fr:
-	gh -msg "Merci." -lang fr
+# Sample for saying something in Dutch.
+say-nl:
+	gh  -msg "Dank je" -lang nl
 
 # Sample for saying something in German.
 say-de:
 	gh  -msg "Danke." -lang de
+
+# Sample for saying something in French.
+say-fr:
+	gh -msg "Merci." -lang fr
 
 
 # Sample for using specific IP address of Google Home.

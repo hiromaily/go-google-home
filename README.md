@@ -62,11 +62,14 @@ $ gh -msg "Thank you." -lang en
 # Sample for saying something in Japanese.
 $ gh -msg "ありがとうございます" -lang ja
 
-# Sample for saying something in French.
-$ gh -msg "Merci." -lang fr
+# Sample for saying something in Dutch.
+$ gh -msg "Dank je" -lang nl
 
 # Sample for saying something in German.
 $ gh -msg "Danke." -lang de
+
+# Sample for saying something in French.
+$ gh -msg "Merci." -lang fr
 
 
 # Sample for saying something in English with `debug` log.

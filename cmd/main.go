@@ -14,7 +14,6 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
-	//"sync"
 	"time"
 )
 
@@ -64,7 +63,6 @@ func init() {
 }
 
 func main() {
-	//m := new(sync.Mutex)
 
 	if !*server && *message == "" {
 		flag.Usage()
@@ -113,7 +111,8 @@ func main() {
 	}
 
 	//TODO: monitor status
-	//TODO: it causes DATA RACE
+	//TODO: It causes DATA RACE
+	//m := new(sync.Mutex)
 	//go func() {
 	//	status, err := gh.GetStatus()
 	//	if err != nil {
@@ -200,22 +199,6 @@ func (g *GHServer) speakHandler() func(http.ResponseWriter, *http.Request) {
 		fmt.Fprint(w, text)
 	}
 }
-
-//func (g *GHServer) ssmlHandler() func(http.ResponseWriter, *http.Request) {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		//url
-//		url := "http://192.168.178.157:8080/ssml/sample.ssml"
-//		err := g.SpeakBySSML(url)
-//		if err != nil {
-//			http.Error(w, "It couldn't speak.", http.StatusInternalServerError)
-//			lg.Errorf("gh.Speak() error:%v", err)
-//			return
-//		}
-//
-//		w.WriteHeader(http.StatusOK)
-//		fmt.Fprint(w, 200)
-//	}
-//}
 
 func (g *GHServer) speak(w http.ResponseWriter, text string) error {
 	if text != "" {
