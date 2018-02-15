@@ -1,4 +1,12 @@
 # go-google-home
+
+[![Build Status](https://travis-ci.org/hiromaily/go-google-home.svg?branch=master)](https://travis-ci.org/hiromaily/go-google-home)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hiromaily/go-google-home)](https://goreportcard.com/report/github.com/hiromaily/go-google-home)
+[![codebeat badge](https://codebeat.co/badges/9ddc2e04-f22a-4448-8e7d-ca0c717c76ef)](https://codebeat.co/projects/github-com-hiromaily-go-google-home-master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5c83a126d63c402f9a8242295d4a79c4)](https://www.codacy.com/app/hiromaily2/go-google-home?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hiromaily/go-google-home&amp;utm_campaign=Badge_Grade)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-goa/master/LICENSE)
+
+
 It makes Google Home speak something and is inspired by 
 [google-home-notifier](https://github.com/noelportugal/google-home-notifier).  
 There are 2 modes.
