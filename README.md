@@ -48,14 +48,15 @@ if *server {
 
 
 #### About options in cmd/main.go
-| Options        |                                           | Type   | Example                 |
-| -------------- | ------------------------------------------ | -------| ---------------------- |
-| msg            | Message to Google Home                     | string | "Hello world!"         |
-| addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009" |
-| lang           | Language to speak                          | string | en                     |
-| server         | Run by server mode                         | bool   | none                   |
-| port           | Web Server port                            | int    | 8080                   |
-| log            | Log level, `1` displays even debug message | int    | 1                      |
+| Options        |                                           | Type   | Example                    |
+| -------------- | ------------------------------------------ | -------| ------------------------- |
+| msg            | Message to Google Home                     | string | "Hello world!"            |
+| music          | Message to Google Home                     | string | "http://music.com/aa.mp3" |
+| addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009"    |
+| lang           | Language to speak                          | string | en                        |
+| server         | Run by server mode                         | bool   | none                      |
+| port           | Web Server port                            | int    | 8080                      |
+| log            | Log level, `1` displays even debug message | int    | 1                         |
 
 - Environment variable `GOOGLE_HOME_IP` is used for IP Address of GOOGLE HOME.
 
@@ -80,6 +81,9 @@ $ gh -msg "Danke." -lang de
 
 # Sample for saying something in French.
 $ gh -msg "Merci." -lang fr
+
+# Sample for playing music.
+$ gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
 
 
 # Sample for saying something in English with `debug` log.
