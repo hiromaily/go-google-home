@@ -14,6 +14,7 @@ import (
 	"github.com/micro/mdns"
 	"net"
 	ur "net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -151,6 +152,18 @@ func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
 
 	//*MediaStatusResponse, error
 	return media.GetStatus(c.ctx)
+}
+
+func (c *Controller) SetVolume(vol string) error {
+	receiver := c.Client.Receiver()
+	level, _ := strconv.ParseFloat(vol, 64)
+	muted := false
+	volume := ctl.Volume{Level: &level, Muted: &muted}
+	_, err := receiver.SetVolume(c.ctx, &volume)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Controller) Close() {
