@@ -108,3 +108,7 @@ $ brew cask install ngrok
 # If you use 8080 port for that local server.
 $ ngrok http 8080
 ```
+
+#### Special Thanks
+Using sample music from [https://www.bensound.com](https://www.bensound.com/royalty-free-music/electronica) as royalty-free.
+
