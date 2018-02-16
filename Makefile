@@ -39,6 +39,10 @@ say-de:
 say-fr:
 	gh -msg "Merci." -lang fr
 
+# Sample for saying by specific sound volume.
+say-en:
+	gh -msg "Thank you." -vol 0.3
+
 
 # Sample for playing music.
 play-music:

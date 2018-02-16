@@ -22,6 +22,7 @@ var (
 	music      = flag.String("music", "", "URL of Music file")
 	address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
+	volume     = flag.String("vol", "", "Volume: 0.0-1.0")
 	server     = flag.Bool("server", false, "Run by server mode")
 	serverPort = flag.Int("port", 8080, "Server port")
 	logLevel   = flag.Int("log", 2, "log level. `1`:debug mode")
@@ -30,8 +31,10 @@ var (
 var usage = `Usage: %s [options...]
 Options:
   -msg    Message to Google Home.
+  -music  URL of Music file.      [e.g.] http://music.xxx/music.mp3
   -addr   Address of Google Home. [e.g.] 192.168.x.x:8009
   -lang   Language to speak.      [e.g.] en, de, nl, fr, ja ...
+  -vol    Volume: 0.0-1.0         [e.g.] 0.3 
   -server Run by server mode.     [e.g.] $ gh -server
   -port   Server port.
   -log    Log level.              [e.g.] 1: debug log
@@ -93,6 +96,12 @@ func main() {
 	// create client
 	gh.NewClient()
 	defer gh.Close()
+
+	//volume
+	//TODO:Fix DATA RACE
+	if *volume != ""{
+		gh.SetVolume(*volume)
+	}
 
 	// server mode
 	if *server {

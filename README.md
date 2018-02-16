@@ -54,6 +54,7 @@ if *server {
 | music          | Message to Google Home                     | string | "http://music.com/aa.mp3" |
 | addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009"    |
 | lang           | Language to speak                          | string | en                        |
+| vol            | Volume                                     | string | 0.3                       |
 | server         | Run by server mode                         | bool   | none                      |
 | port           | Web Server port                            | int    | 8080                      |
 | log            | Log level, `1` displays even debug message | int    | 1                         |
@@ -81,6 +82,10 @@ $ gh -msg "Danke." -lang de
 
 # Sample for saying something in French.
 $ gh -msg "Merci." -lang fr
+
+# Sample for saying by specific sound volume.
+$ gh -msg "Thank you." -vol 0.3
+
 
 # Sample for playing music.
 $ gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
