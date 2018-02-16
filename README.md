@@ -51,7 +51,7 @@ if *server {
 | Options        |                                           | Type   | Example                    |
 | -------------- | ------------------------------------------ | -------| ------------------------- |
 | msg            | Message to Google Home                     | string | "Hello world!"            |
-| music          | Message to Google Home                     | string | "http://music.com/aa.mp3" |
+| music          | URL of music file to play on Google Home   | string | "http://music.com/aa.mp3" |
 | addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009"    |
 | lang           | Language to speak                          | string | en                        |
 | vol            | Volume                                     | string | 0.3                       |
