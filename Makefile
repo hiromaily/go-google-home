@@ -42,7 +42,7 @@ say-fr:
 
 # Sample for playing music.
 play-music:
-	gh -music "http://something.xxx/music.mp3"
+	gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
 
 
 # Sample for using specific IP address of Google Home.
