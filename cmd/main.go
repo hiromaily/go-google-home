@@ -19,6 +19,7 @@ import (
 
 var (
 	message    = flag.String("msg", "", "Message to Google Home")
+	music      = flag.String("music", "", "URL of Music file")
 	address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
 	server     = flag.Bool("server", false, "Run by server mode")
@@ -64,7 +65,7 @@ func init() {
 
 func main() {
 
-	if !*server && *message == "" {
+	if !*server && *message == "" && *music == "" {
 		flag.Usage()
 		os.Exit(1)
 		return
@@ -103,10 +104,27 @@ func main() {
 	finishNotification := make(chan bool)
 	gh.RunEventReceiver(finishNotification)
 
-	// speak something
-	err = gh.Speak(*message, *lang)
-	if err != nil {
-		lg.Errorf("gh.Speak() error:%v", err)
+	if *message != "" {
+		// speak something
+		err = gh.Speak(*message, *lang)
+		if err != nil {
+			lg.Errorf("gh.Speak() error:%v", err)
+			close(finishNotification)
+			close(gh.Client.Events)
+			return
+		}
+	} else if *music != "" {
+		// play music
+		err = gh.Play(*music)
+		if err != nil {
+			lg.Errorf("gh.Play() error:%v", err)
+			close(finishNotification)
+			close(gh.Client.Events)
+			return
+		}
+	} else {
+		//this part should not be passed.
+		close(finishNotification)
 		return
 	}
 

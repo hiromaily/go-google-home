@@ -13,6 +13,8 @@ There are 2 modes.
 - command line mode with text parameter.
 - server mode hadling post message.
 
+#### [WIP] playing music functionality is still ongoing.
+
 
 ## Sample code
 It is in `cmd` directory with Makefile.

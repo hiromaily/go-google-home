@@ -40,14 +40,19 @@ say-fr:
 	gh -msg "Merci." -lang fr
 
 
+# Sample for playing music.
+play-music:
+	gh -music "http://something.xxx/music.mp3"
+
+
 # Sample for using specific IP address of Google Home.
 say-with_address:
-	gh  -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
+	gh -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
 
 
 # Sample for saying something in English with `debug` log.
 say-debug:
-	gh  -msg "This displays debug log." -log 1
+	gh -msg "This displays debug log." -log 1
 
 
 # Sample for server mode.
