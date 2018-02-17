@@ -4,7 +4,7 @@ build:
 
 build-mac: GOOS=darwin GOARCH=amd64
 build-mac:
-	go build -i -race -v -o ./cmd/releases/darwin_amd64/gh ./cmd/
+	go build -i -v -o ./cmd/releases/darwin_amd64/gh ./cmd/
 
 build-linux: GOOS=linux
 build-linux:
