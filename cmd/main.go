@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
-	"strings"
 	"time"
 
 	gglh "github.com/hiromaily/go-google-home/pkg/googlehome"
@@ -18,14 +16,14 @@ import (
 )
 
 var (
-	message    = flag.String("msg", "", "Message to Google Home")
-	music      = flag.String("music", "", "URL of Music file")
-	address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
+	message = flag.String("msg", "", "Message to Google Home")
+	music   = flag.String("music", "", "URL of Music file")
+	//address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
+	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
 	volume     = flag.String("vol", "", "Volume: 0.0-1.0")
 	server     = flag.Bool("server", false, "Run by server mode")
 	serverPort = flag.Int("port", 8080, "Server port")
-	logLevel   = flag.Int("log", 2, "log level. `1`:debug mode")
 )
 
 var usage = `Usage: %s [options...]
@@ -42,10 +40,12 @@ Options:
 See Makefile for examples.
 `
 
+// GHServer is google home server
 type GHServer struct {
 	*gglh.GoogleHome
 }
 
+// Speak is test object
 type Speak struct {
 	Text string `json:"text"`
 }
@@ -57,27 +57,37 @@ func init() {
 	flag.Parse()
 }
 
-func main() {
+func validateArguments() {
+	// this pattern is not allowed
 	if !*server && *message == "" && *music == "" {
 		flag.Usage()
 		os.Exit(1)
 		return
 	}
+}
+
+func main() {
+	//validate
+	validateArguments()
 
 	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[Google-Home]", "", "hiromaily")
 
 	var gh *gglh.GoogleHome
 	var err error
 
+	//TODO: is it better to environment variable if existing
+	//os.Getenv("GOOGLE_HOME_IP")
 	if *address != "" {
 		// create object from address
-		gh, err = setAddress(*address)
+		lg.Infof("from address: %s", *address)
+		gh, err = gglh.NewGoogleHome().WithAddressString(*address)
 		if err != nil {
 			lg.Error(err)
 			return
 		}
 	} else {
 		// discover Google Home
+		lg.Info("discover google home address")
 		gh = gglh.DiscoverService()
 		if gh.Error != nil {
 			lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
@@ -147,22 +157,10 @@ func main() {
 	<-finishNotification
 }
 
-func setAddress(address string) (*gglh.GoogleHome, error) {
-	// 1. use address if it exists.
-	addr := strings.Split(address, ":")
-	if len(addr) != 2 {
-		return nil, fmt.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
-	}
-	port, err := strconv.Atoi(addr[1])
-	if err != nil {
-		return nil, fmt.Errorf("addr argument is invalid. It should be :%s", "xxx.xxx.xxx.xxx:8009")
-	}
-	return gglh.New(addr[0], port), nil
-}
-
 func listen(gh *gglh.GoogleHome) {
-	stopCh := make(chan os.Signal)
+	stopCh := make(chan os.Signal, 1)
 	signal.Notify(stopCh, os.Interrupt)
+	defer signal.Stop(stopCh)
 
 	//server object
 	ghs := GHServer{}
@@ -201,7 +199,7 @@ func (g *GHServer) speakHandler() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 		//check parameter in json
-		text, err := parseJson(w, r)
+		text, err := parseJSON(w, r)
 		if err != nil {
 			return
 		}
@@ -223,19 +221,19 @@ func (g *GHServer) speak(w http.ResponseWriter, text string) error {
 	if text != "" {
 		err := g.Speak(text, *lang)
 		if err != nil {
-			http.Error(w, "It couldn't speak.", http.StatusInternalServerError)
+			http.Error(w, "it couldn't speak", http.StatusInternalServerError)
 			lg.Errorf("gh.Speak() error:%v", err)
 			return err
 		}
 	} else {
-		http.Error(w, "Parameter is invalid.", http.StatusBadRequest)
+		http.Error(w, "parameter is invalid", http.StatusBadRequest)
 		lg.Error("gh.Speak() error: text is blank")
-		return fmt.Errorf("Parameter is invalid.")
+		return fmt.Errorf("parameter is invalid")
 	}
 	return nil
 }
 
-func parseJson(w http.ResponseWriter, r *http.Request) (string, error) {
+func parseJSON(w http.ResponseWriter, r *http.Request) (string, error) {
 	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {

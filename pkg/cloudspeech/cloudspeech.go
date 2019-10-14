@@ -2,6 +2,7 @@ package cloudspeech
 
 //// Convert sound data to text...
 //// https://cloud.google.com/speech/docs/reference/libraries#client-libraries-install-go
+//// https://github.com/googleapis/google-cloud-go/blob/master/speech/apiv1/speech_client_example_test.go
 //
 //import (
 //	"fmt"

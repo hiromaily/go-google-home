@@ -1,4 +1,4 @@
-package tts_engine
+package ttsengine
 
 //import (
 //	"fmt"
