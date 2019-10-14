@@ -1,0 +1,11 @@
+language: go
+sudo: false
+dist: trusty
+go:
+  - tip
+
+install:
+  - go mod download
+
+script:
+  - make release-all

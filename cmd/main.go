@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	gglh "github.com/hiromaily/go-google-home"
-	lg "github.com/hiromaily/golibs/log"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
 	"time"
+
+	gglh "github.com/hiromaily/go-google-home/pkg/googlehome"
+	lg "github.com/hiromaily/golibs/log"
 )
 
 var (
@@ -54,25 +54,17 @@ func init() {
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
 	}
-
 	flag.Parse()
-
-	//log
-	var logFmt = log.Lshortfile
-	if *logLevel != 1 {
-		logFmt = 0
-	}
-	lg.InitializeLog(uint8(*logLevel), lg.LogOff, logFmt,
-		"[Google-Home]", "")
 }
 
 func main() {
-
 	if !*server && *message == "" && *music == "" {
 		flag.Usage()
 		os.Exit(1)
 		return
 	}
+
+	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[Google-Home]", "", "hiromaily")
 
 	var gh *gglh.GoogleHome
 	var err error
@@ -99,7 +91,7 @@ func main() {
 
 	//volume
 	//TODO:Fix DATA RACE
-	if *volume != ""{
+	if *volume != "" {
 		gh.SetVolume(*volume)
 	}
 
