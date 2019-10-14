@@ -80,23 +80,16 @@ func main() {
 	if *address != "" {
 		// create object from address
 		lg.Infof("from address: %s", *address)
-		gh, err = gglh.NewGoogleHome().WithAddressString(*address)
-		if err != nil {
-			lg.Error(err)
-			return
-		}
+		gh = gglh.NewGoogleHome().WithAddressString(*address).WithClient()
 	} else {
 		// discover Google Home
 		lg.Info("discover google home address")
-		gh = gglh.DiscoverService()
-		if gh.Error != nil {
-			lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
-			return
-		}
+		gh = gglh.DiscoverService().WithClient()
 	}
-
-	// create client
-	gh.NewClient()
+	if gh.Error != nil {
+		lg.Errorf("fail to connect Google Home: %v", gh.Error)
+		return
+	}
 	defer gh.Close()
 
 	//volume
@@ -106,6 +99,7 @@ func main() {
 	}
 
 	// server mode
+	//TODO: define as package
 	if *server {
 		listen(gh)
 		return

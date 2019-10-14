@@ -60,19 +60,42 @@ func NewGoogleHomeWithAddress(strIP string, port int) *GoogleHome {
 }
 
 // WithAddressString is ad address, port to GoogleHome object
-func (g *GoogleHome) WithAddressString(address string) (*GoogleHome, error) {
+func (g *GoogleHome) WithAddressString(address string) *GoogleHome {
+	if g.Error != nil {
+		return g
+	}
 	//use address if it exists.
 	addr := strings.Split(address, ":")
 	if len(addr) != 2 {
-		return nil, errors.Errorf("address is invalid. format should be :%s", "xxx.xxx.xxx.xxx:8009")
+		g.Error = errors.Errorf("address is invalid. format should be :%s", "xxx.xxx.xxx.xxx:8009")
+		return g
 	}
 	port, err := strconv.Atoi(addr[1])
 	if err != nil {
-		return nil, errors.Errorf("address is invalid. format should be :%s", "xxx.xxx.xxx.xxx:8009")
+		g.Error = errors.Errorf("address is invalid. format should be :%s", "xxx.xxx.xxx.xxx:8009")
+		return g
 	}
 	g.AddrV4 = net.ParseIP(addr[0])
 	g.Port = port
-	return g, nil
+	return g
+}
+
+// WithClient is to create client for google cast controller
+func (g *GoogleHome) WithClient() *GoogleHome {
+	if g.Error != nil {
+		return g
+	}
+	ctx := context.Background()
+	client := cast.NewClient(g.AddrV4, g.Port)
+	err := client.Connect(ctx)
+	if err != nil {
+		g.Error = errors.Errorf("fail to connect by google cast")
+		return g
+	}
+
+	lg.Infof("Connected to %v:%d", g.AddrV4, g.Port)
+	g.Controller = Controller{Client: client, ctx: ctx}
+	return g
 }
 
 // DiscoverService is to discover google home devices
@@ -107,8 +130,8 @@ func DiscoverService() *GoogleHome {
 			case <-time.After(5 * time.Second):
 				isDone = true
 				close(entriesCh)
-
-				gh := GoogleHome{Error: fmt.Errorf("timeout for discovering devices")}
+				// set error
+				gh := GoogleHome{Error: errors.Errorf("timeout for discovering devices")}
 				notifyService <- &gh
 				return
 			}
@@ -127,20 +150,6 @@ func mdnsLookup(entriesCh chan *mdns.ServiceEntry) {
 	params.Entries = entriesCh
 	//params.WantUnicastResponse = true
 	mdns.Query(params)
-}
-
-// NewClient is to create client for google cast controller
-func (g *GoogleHome) NewClient() error {
-	ctx := context.Background()
-	client := cast.NewClient(g.AddrV4, g.Port)
-	err := client.Connect(ctx)
-	if err != nil {
-		return err
-	}
-
-	lg.Infof("Connected to %v:%d", g.AddrV4, g.Port)
-	g.Controller = Controller{Client: client, ctx: ctx}
-	return nil
 }
 
 // Speak is to speak by text
