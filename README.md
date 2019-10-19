@@ -7,47 +7,15 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-goa/master/LICENSE)
 
 
-It makes Google Home speak something and is inspired by 
+It makes Google Home spoken something and is inspired by 
 [google-home-notifier](https://github.com/noelportugal/google-home-notifier).  
 There are 2 modes.
-- command line mode with text parameter.
-- server mode hadling post message.
-
-#### [WIP] playing music functionality is still ongoing.
-
-
-## Sample code
-It is in `cmd` directory with Makefile.
-
-```
-// 1.discover Google Home
-gh := gglh.DiscoverService()
-if gh.Error != nil {
-    lg.Errorf("gglh.DiscoverService() error:%v", gh.Error)
-    return
-}
-// if you use specific address
-//gh := gglh.New("192.168.178.164", 8009)
-
-// 2.create client
-gh.NewClient()
-defer gh.Close()
-
-// 3.server mode
-if *server {
-    listen(gh)
-} else {
-    // 4.speak something
-    err := gh.Speak(*message, *lang)
-    if err != nil {
-        lg.Errorf("gh.Speak() error:%v", err)
-        return
-    }
-}
-```
+- command line interface with text parameter.
+- server mode handling HTTP post message.
+- [WIP] playing music functionality is still ongoing.
 
 
-#### About options in cmd/main.go
+## command line option
 | Options        |                                           | Type   | Example                    |
 | -------------- | ------------------------------------------ | -------| ------------------------- |
 | msg            | Message to Google Home                     | string | "Hello world!"            |
@@ -59,14 +27,14 @@ if *server {
 | port           | Web Server port                            | int    | 8080                      |
 | log            | Log level, `1` displays even debug message | int    | 1                         |
 
-- Environment variable `GOOGLE_HOME_IP` is used for IP Address of GOOGLE HOME.
+- GoogleHome IP address would be detected automatically. So it's not necessarily to run with specific IP address.
+- Environment variable `GOOGLE_HOME_IP` is used for GoogleHome IP address.
 
 
-#### Execution example
+## Execution example
 ```
 # Build
-$ go build -i -race -v -o ${GOPATH}/bin/gh ./cmd/
-
+$ go build -i -v -o ${GOPATH}/bin/gh ./cmd/
 
 # Sample for saying something in English.
 $ gh -msg "Thank you." -lang en
@@ -86,19 +54,19 @@ $ gh -msg "Merci." -lang fr
 # Sample for saying by specific sound volume.
 $ gh -msg "Thank you." -vol 0.3
 
-
-# Sample for playing music.
-$ gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
-
-
 # Sample for saying something in English with `debug` log.
 $ gh -msg "This displays debug log." -log 1
-
 
 # Sample for using specific IP address of Google Home.
 $ gh  -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
 
 
+# Sample for playing music.
+$ gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
+```
+
+## run as server
+```
 # Sample for server mode.
 $ gh -server
 
@@ -106,7 +74,8 @@ $ gh -server
 $ http POST http://localhost:8080/speak text="It's sunny day today."
 ```
 
-## How to access to local server from outside
+
+## How to access to local server from outside easily?
 Use [Ngrok](https://github.com/inconshreveable/ngrok)
 
 #### Install on Mac
@@ -118,6 +87,6 @@ $ brew cask install ngrok
 $ ngrok http 8080
 ```
 
-#### Special Thanks
-Using sample music from [https://www.bensound.com](https://www.bensound.com/royalty-free-music/electronica) as royalty-free.
 
+## Special Thanks
+Using sample music from [https://www.bensound.com](https://www.bensound.com/royalty-free-music/electronica) as royalty-free.

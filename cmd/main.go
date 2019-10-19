@@ -70,6 +70,7 @@ func main() {
 
 	// wait events
 	finishNotification := make(chan bool)
+	var err error
 
 	switch {
 	case *server:
@@ -77,25 +78,24 @@ func main() {
 		gh.StartServer(*serverPort, *lang)
 		return
 	case *message != "":
-	case *music != "":
+		lg.Infof("speak: %s", *message)
 		gh.RunEventReceiver(finishNotification)
 
-		var err error
-		if *message != "" {
-			// speak something
-			err = gh.Speak(*message, *lang)
-		} else {
-			// play music
-			err = gh.Play(*music)
-		}
+		// speak something
+		err = gh.Speak(*message, *lang)
+	case *music != "":
+		lg.Infof("play: %s", *music)
+		gh.RunEventReceiver(finishNotification)
 
-		if err != nil {
-			lg.Errorf("gh.Speak()/gh.Play() error:%v", err)
-			close(finishNotification)
-			close(gh.Client.Events)
-			return
-		}
+		// play music
+		err = gh.Play(*music)
 	default:
+	}
+	if err != nil {
+		lg.Errorf("fail to speak/play: %v", err)
+		close(finishNotification)
+		close(gh.Client.Events)
+		return
 	}
 
 	monitorStatus()
