@@ -6,17 +6,15 @@ package googlehome
 import (
 	"context"
 	"fmt"
-
-	"github.com/barnybug/go-cast"
-	ctl "github.com/barnybug/go-cast/controllers"
-	"github.com/barnybug/go-cast/events"
-
 	"net"
 	ur "net/url"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/barnybug/go-cast"
+	ctl "github.com/barnybug/go-cast/controllers"
+	"github.com/barnybug/go-cast/events"
 	"github.com/bookerzzz/grok"
 	"github.com/micro/mdns"
 
@@ -32,19 +30,34 @@ const (
 	ghPrefix    = "Google-Home-"
 )
 
+//-----------------------------------------------------------------------------
+// Controller
+//-----------------------------------------------------------------------------
+
+// Controller is Controller interface
+type Controller interface {
+	Speak(text string, language string) error
+	Play(url string) error
+	Stop() error
+	GetStatus() (*ctl.MediaStatusResponse, error)
+	SetVolume(vol string) error
+	Close()
+	RunEventReceiver(notify chan bool)
+	DebugStatus(status *ctl.MediaStatusResponse)
+}
+
+//-----------------------------------------------------------------------------
+// GoogleHome
+//-----------------------------------------------------------------------------
+
 // GoogleHome is GoogleHome object
 type GoogleHome struct {
 	host   string
 	AddrV4 net.IP
 	Port   int
 	Error  error
-	Controller
-}
-
-// Controller is for controlling google home by cast.Client
-type Controller struct {
-	Client *cast.Client
-	ctx    context.Context
+	//ctl Controller
+	Control
 }
 
 // NewGoogleHome is to return empty GoogleHome object
@@ -94,7 +107,8 @@ func (g *GoogleHome) WithClient() *GoogleHome {
 	}
 
 	lg.Infof("Connected to %v:%d", g.AddrV4, g.Port)
-	g.Controller = Controller{Client: client, ctx: ctx}
+	//g.ctl = &Control{Client: client, ctx: ctx}
+	g.Control = Control{Client: client, ctx: ctx}
 	return g
 }
 
@@ -152,14 +166,24 @@ func mdnsLookup(entriesCh chan *mdns.ServiceEntry) {
 	mdns.Query(params)
 }
 
+//-----------------------------------------------------------------------------
+// Controller
+//-----------------------------------------------------------------------------
+
+// Control is for controlling google home by cast.Client
+type Control struct {
+	Client *cast.Client
+	ctx    context.Context
+}
+
 // Speak is to speak by text
-func (c *Controller) Speak(text string, language string) error {
+func (c *Control) Speak(text string, language string) error {
 	u := fmt.Sprintf(ttsURL, ur.QueryEscape(text), ur.QueryEscape(language))
 	return c.Play(u)
 }
 
 // Play is to play music by url
-func (c *Controller) Play(url string) error {
+func (c *Control) Play(url string) error {
 	media, err := c.Client.Media(c.ctx)
 	if err != nil {
 		return err
@@ -175,7 +199,7 @@ func (c *Controller) Play(url string) error {
 }
 
 // Stop is stop playing music
-func (c *Controller) Stop() error {
+func (c *Control) Stop() error {
 	if !c.Client.IsPlaying(c.ctx) {
 		return nil
 	}
@@ -188,7 +212,7 @@ func (c *Controller) Stop() error {
 }
 
 // GetStatus is to get google cast client status
-func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
+func (c *Control) GetStatus() (*ctl.MediaStatusResponse, error) {
 	media, err := c.Client.Media(c.ctx)
 	if err != nil {
 		return nil, err
@@ -199,7 +223,7 @@ func (c *Controller) GetStatus() (*ctl.MediaStatusResponse, error) {
 }
 
 // SetVolume is to set volume
-func (c *Controller) SetVolume(vol string) error {
+func (c *Control) SetVolume(vol string) error {
 	receiver := c.Client.Receiver()
 	level, _ := strconv.ParseFloat(vol, 64)
 	muted := false
@@ -212,13 +236,12 @@ func (c *Controller) SetVolume(vol string) error {
 }
 
 // Close is to close google cast client
-func (c *Controller) Close() {
+func (c *Control) Close() {
 	c.Client.Close()
 }
 
 // RunEventReceiver is to receive current event
-// FIXME: it seems to be useless.
-func (c *Controller) RunEventReceiver(notify chan bool) {
+func (c *Control) RunEventReceiver(notify chan bool) {
 	go func() {
 		for evt := range c.Client.Events {
 			//TODO:evt is type of interface, it should be casted to something.
@@ -252,7 +275,7 @@ func (c *Controller) RunEventReceiver(notify chan bool) {
 }
 
 // DebugStatus is for debugging of status
-func (c *Controller) DebugStatus(status *ctl.MediaStatusResponse) {
+func (c *Control) DebugStatus(status *ctl.MediaStatusResponse) {
 	fmt.Println("DebugStatus(): *ctl.MediaStatusResponse:status")
 	grok.Value(status)
 }
