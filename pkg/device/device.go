@@ -2,11 +2,12 @@ package device
 
 import (
 	"context"
+	"net"
+	"strconv"
+
 	"github.com/barnybug/go-cast"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"net"
-	"strconv"
 
 	"github.com/hiromaily/go-google-home/pkg/controller"
 )

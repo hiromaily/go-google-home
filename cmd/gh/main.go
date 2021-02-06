@@ -20,7 +20,7 @@ var (
 	lang     = flag.String("lang", "en", "Language to speak")
 	volume   = flag.String("vol", "", "Volume: 0.0-1.0")
 	server   = flag.Bool("server", false, "Run by server mode")
-	//serverPort = flag.Int("port", 8080, "Server port")
+	// serverPort = flag.Int("port", 8080, "Server port")
 )
 
 var usage = `Usage: %s [options...]
