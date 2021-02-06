@@ -148,7 +148,8 @@ func (c *controller) RunEventReceiver(notify chan struct{}) {
 				)
 				if evtType.IdleReason == "FINISHED" {
 					c.logger.Debug("controllers.MediaStatus: FINISHED")
-					notify <- struct{}{}
+					close(notify)
+					//notify <- struct{}{}
 				}
 			case events.AppStarted:
 				c.logger.Debug("evtType: AppStarted")

@@ -55,7 +55,7 @@ func (w *wrapperCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...inter
 
 	defer func() {
 		w.devicer.Close()
-		close(w.chFinishNotifier)
+		//close(w.chFinishNotifier)
 	}()
 
 	// execute
