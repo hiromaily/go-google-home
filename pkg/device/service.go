@@ -4,10 +4,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/micro/mdns"
+	//"github.com/micro/mdns"
+	"github.com/hiromaily/go-google-home/pkg/mdns"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
+
+// TODO: maybe better
+// https://github.com/hashicorp/mdns
 
 //-----------------------------------------------------------------------------
 // ServiceServiceReceiver
