@@ -3,8 +3,9 @@ package mdns
 import (
 	"reflect"
 	"testing"
+
+	"github.com/miekg/dns"
 )
-import "github.com/miekg/dns"
 
 type mockMDNSService struct{}
 
@@ -21,7 +22,6 @@ func (s *mockMDNSService) Records(q dns.Question) []dns.RR {
 		},
 	}
 }
-
 func (s *mockMDNSService) Announcement() []dns.RR {
 	return []dns.RR{
 		&dns.PTR{
@@ -35,7 +35,6 @@ func (s *mockMDNSService) Announcement() []dns.RR {
 		},
 	}
 }
-
 func TestDNSSDServiceRecords(t *testing.T) {
 	s := &DNSSDService{
 		MDNSService: &MDNSService{
@@ -52,7 +51,6 @@ func TestDNSSDServiceRecords(t *testing.T) {
 	if got, want := len(recs), 1; got != want {
 		t.Fatalf("s.Records(%v) returned %v records, want %v", q, got, want)
 	}
-
 	want := dns.RR(&dns.PTR{
 		Hdr: dns.RR_Header{
 			Name:   "_services._dns-sd._udp.local.",

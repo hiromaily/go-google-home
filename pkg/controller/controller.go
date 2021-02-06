@@ -33,7 +33,7 @@ type Controller interface {
 	SetVolume(vol string) error
 	Close()
 	CloseEvent()
-	RunEventReceiver(notify chan bool)
+	RunEventReceiver(notify chan struct{})
 	DebugStatus(status *controllers.MediaStatusResponse)
 }
 
@@ -133,7 +133,7 @@ func (c *controller) CloseEvent() {
 }
 
 // RunEventReceiver runs event receiver of client status
-func (c *controller) RunEventReceiver(notify chan bool) {
+func (c *controller) RunEventReceiver(notify chan struct{}) {
 	go func() {
 		for evt := range c.client.Events {
 			// evt is type of interface, it should be asserted
@@ -148,7 +148,7 @@ func (c *controller) RunEventReceiver(notify chan bool) {
 				)
 				if evtType.IdleReason == "FINISHED" {
 					c.logger.Debug("controllers.MediaStatus: FINISHED")
-					notify <- true
+					notify <- struct{}{}
 				}
 			case events.AppStarted:
 				c.logger.Debug("evtType: AppStarted")

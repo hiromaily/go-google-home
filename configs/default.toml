@@ -1,6 +1,14 @@
 
+[device]
+address = "" # e.g. "192.168.x.x:8009"
+lang = "en"  # default language
+timeout = "5s"
+
 [logger]
 service = "google-home"
 env = "custom" # dev, prod, custom :for only zap logger
 level = "debug" # debug, info, warn, error
 is_stacktrace = false
+
+[server]
+port = 8080

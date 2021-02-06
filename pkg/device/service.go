@@ -5,9 +5,10 @@ import (
 	"time"
 
 	//"github.com/micro/mdns"
-	"github.com/hiromaily/go-google-home/pkg/mdns"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"github.com/hiromaily/go-google-home/pkg/mdns"
 )
 
 // TODO: maybe better
@@ -23,13 +24,15 @@ type ServiceReceiver interface {
 }
 
 type serviceReceiver struct {
-	logger *zap.Logger
+	logger  *zap.Logger
+	timeout time.Duration
 }
 
 // NewServiceReceiver returns ServiceReceiver
-func NewServiceReceiver(logger *zap.Logger) ServiceReceiver {
+func NewServiceReceiver(logger *zap.Logger, timeout time.Duration) ServiceReceiver {
 	return &serviceReceiver{
-		logger: logger,
+		logger:  logger,
+		timeout: timeout,
 	}
 }
 
@@ -49,7 +52,6 @@ func (s *serviceReceiver) Discover() *Service {
 		for {
 			select {
 			case entry := <-chEntry:
-				s.logger.Info("Discovered Device.")
 				if isDone {
 					return
 				}
@@ -67,7 +69,7 @@ func (s *serviceReceiver) Discover() *Service {
 					close(chEntry)
 					return
 				}
-			case <-time.After(30 * time.Second):
+			case <-time.After(s.timeout):
 				isDone = true
 				close(chEntry)
 				chNotifier <- &Service{Error: errors.Errorf("can't discover devices by timeout")}

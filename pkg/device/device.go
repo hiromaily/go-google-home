@@ -23,12 +23,13 @@ const (
 
 // Device interface
 type Device interface {
-	Start(addr string) (Device, error)
+	Start() (Device, error)
 	withIPPort(ip string, port int) Device
 	WithAddress(address string) Device
 	WithService(srv *Service) Device
 	WithClient() Device
 	Controller() controller.Controller
+	Lang() string
 	Error() error
 	Close()
 }
@@ -37,6 +38,8 @@ type device struct {
 	logger          *zap.Logger
 	serviceReceiver ServiceReceiver
 	ctl             controller.Controller
+	defaultAddr     string
+	lang            string
 	host            string
 	addrV4          net.IP
 	port            int
@@ -44,19 +47,26 @@ type device struct {
 }
 
 // NewDevice returns Device interface
-func NewDevice(logger *zap.Logger, serviceReceiver ServiceReceiver) Device {
+func NewDevice(
+	logger *zap.Logger,
+	serviceReceiver ServiceReceiver,
+	addr string,
+	lang string,
+) Device {
 	return &device{
 		logger:          logger,
 		serviceReceiver: serviceReceiver,
+		defaultAddr:     addr,
+		lang:            lang,
 	}
 }
 
 // Start starts setup for Device
-func (d *device) Start(addr string) (Device, error) {
-	if addr != "" {
+func (d *device) Start() (Device, error) {
+	if d.defaultAddr != "" {
 		// create object from address
-		d.logger.Debug("Start()", zap.String("address", addr))
-		return d.WithAddress(addr).WithClient(), nil
+		d.logger.Debug("Start()", zap.String("address", d.defaultAddr))
+		return d.WithAddress(d.defaultAddr).WithClient(), nil
 	}
 	// discover Google Home
 	d.logger.Debug("discover google home address")
@@ -138,6 +148,11 @@ func (d *device) Controller() controller.Controller {
 	return d.ctl
 }
 
+// Lang returns lang
+func (d *device) Lang() string {
+	return d.lang
+}
+
 // Error returns error
 func (d *device) Error() error {
 	return d.err
@@ -146,4 +161,5 @@ func (d *device) Error() error {
 // Close closes device
 func (d *device) Close() {
 	d.ctl.Close()
+	d.ctl.CloseEvent()
 }

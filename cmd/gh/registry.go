@@ -11,6 +11,7 @@ import (
 // Registry interface
 type Registry interface {
 	NewDevicer() device.Device
+	NewLogger() *zap.Logger
 }
 
 type registry struct {
@@ -26,12 +27,14 @@ func NewRegistry(conf *config.Root) Registry {
 // NewDevicer return device.Device interface
 func (r *registry) NewDevicer() device.Device {
 	return device.NewDevice(
-		r.newLogger(),
+		r.NewLogger(),
 		r.newServiceReceiver(),
+		r.conf.Device.Address,
+		r.conf.Device.Lang,
 	)
 }
 
-func (r *registry) newLogger() *zap.Logger {
+func (r *registry) NewLogger() *zap.Logger {
 	if r.logger == nil {
 		r.logger = logger.NewZapLogger(r.conf.Logger)
 	}
@@ -39,5 +42,5 @@ func (r *registry) newLogger() *zap.Logger {
 }
 
 func (r *registry) newServiceReceiver() device.ServiceReceiver {
-	return device.NewServiceReceiver(r.newLogger())
+	return device.NewServiceReceiver(r.NewLogger(), r.conf.Device.Timeout)
 }
