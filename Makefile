@@ -85,8 +85,8 @@ say-fr:
 	gh -lang fr -msg "Merci."
 
 # Sample for saying by specific sound volume.
-.PHONY: say-en2
-say-en2:
+.PHONY: say-volume
+say-volume:
 	gh -vol 0.3 speak -msg "Thank you."
 
 
@@ -105,11 +105,36 @@ say-with-address:
 # server mode
 ###############################################################################
 # Sample for server mode.
-.PHONY: server
-server:
-	gh server
+#.PHONY: server
+#server:
+#	gh server
 
 # Sample to post message to server by HTTPie
-.PHONY: post-msg
-post-msg:
-	http POST http://localhost:8080/speak text="It's sunny day today."
+#.PHONY: post-msg
+#post-msg:
+#	http POST http://localhost:8080/speak text="It's sunny day today."
+
+###############################################################################
+# Release
+# https://github.com/goreleaser/goreleaser
+###############################################################################
+.PHONY: release
+release:
+	#goreleaser release
+	goreleaser release --rm-dist
+	rm -rf gh.json
+
+
+.PHONY: brew-install
+brew-install:
+	brew install hiromaily/tap/go-google-home
+	# book-teacher
+
+brew-uninstall:
+	brew uninstall hiromaily/tap/go-google-home
+
+brew-update:
+	brew update
+
+.PHONY: brew-reinstall
+brew-reinstall: brew-uninstall brew-update brew-install

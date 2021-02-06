@@ -1,0 +1,57 @@
+# This is an example .goreleaser.yml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+    - cp configs/default.toml gh.toml
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd/gh/
+    binary: gh
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    files:
+      - gh.toml
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^build:'
+      - '^images:'
+      - '^scripts:'
+
+# https://goreleaser.com/customization/homebrew/
+brews:
+  - tap:
+      owner: hiromaily
+      name: homebrew-tap
+    folder: Formula
+    description: speak message on Google Home
+    homepage: https://github.com/hiromaily/go-google-home
+    install: |
+      bin.install "gh"
+      (etc/"google-home").install "gh.toml"
+    test: |
+      system "#{bin}/gh -v"
+    caveats:  |
+      gh has been installed, have fun!
+      config file has been installed in /usr/local/etc/google-home/gh.toml
+      please modify these files as you want.
+      More information:
+        https://github.com/hiromaily/go-google-home
