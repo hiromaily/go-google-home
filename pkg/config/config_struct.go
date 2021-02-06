@@ -1,9 +1,5 @@
 package config
 
-import (
-	"time"
-)
-
 // Root is root config
 type Root struct {
 	Device *Device `toml:"device" validate:"required"`
@@ -13,9 +9,9 @@ type Root struct {
 
 // Device is device property
 type Device struct {
-	Address string        `toml:"address"`
-	Lang    string        `toml:"lang"`
-	Timeout time.Duration `toml:"timeout" validate:"required"`
+	Address string `toml:"address"`
+	Lang    string `toml:"lang"`
+	Timeout string `toml:"timeout" validate:"required"`
 }
 
 // Logger is zap logger property
@@ -28,5 +24,5 @@ type Logger struct {
 
 // Server is server property
 type Server struct {
-	Port string `toml:"port"`
+	Port int `toml:"port"`
 }

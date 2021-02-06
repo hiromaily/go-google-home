@@ -2,6 +2,7 @@ package main
 
 import (
 	"go.uber.org/zap"
+	"time"
 
 	"github.com/hiromaily/go-google-home/pkg/config"
 	"github.com/hiromaily/go-google-home/pkg/device"
@@ -42,5 +43,9 @@ func (r *registry) NewLogger() *zap.Logger {
 }
 
 func (r *registry) newServiceReceiver() device.ServiceReceiver {
-	return device.NewServiceReceiver(r.NewLogger(), r.conf.Device.Timeout)
+	parsedDuration, err := time.ParseDuration(r.conf.Device.Timeout)
+	if err != nil {
+		panic(err)
+	}
+	return device.NewServiceReceiver(r.NewLogger(), parsedDuration)
 }
