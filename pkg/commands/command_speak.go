@@ -51,6 +51,7 @@ func (c *speakCmd) SetFlags(f *flag.FlagSet) {
 
 func (c *speakCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	if c.message == "" {
+		c.logger.Warn("-msg is required")
 		return subcommands.ExitFailure
 	}
 	c.logger.Info("speaks", zap.String("msg", c.message))
