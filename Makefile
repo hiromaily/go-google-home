@@ -53,7 +53,7 @@ build-version:
 
 .PHONY: run
 run:
-	go run -v ./cmd/gh/ -msg "My name is Hiroki. Nice to meet you. How's it going? Thank you."
+	go run -v ./cmd/gh/ speak -msg "My name is Hiroki. Nice to meet you. How's it going? Thank you."
 
 
 ###############################################################################
@@ -62,50 +62,44 @@ run:
 # Sample for saying something in English.
 .PHONY: say-en
 say-en:
-	gh -msg "Thank you."
+	gh speak -msg "Thank you."
 
 # Sample for saying something in Japanese.
 .PHONY: say-ja
 say-ja:
-	gh  -msg "ありがとうございます" -lang ja
+	gh speak -msg "ありがとうございます" -lang ja
 
 # Sample for saying something in Dutch.
 .PHONY: say-nl
 say-nl:
-	gh  -msg "Dank je" -lang nl
+	gh -lang nl speak -msg "Dank je"
 
 # Sample for saying something in German.
 .PHONY: say-de
 say-de:
-	gh  -msg "Danke." -lang de
+	gh -lang de speak -msg "Danke."
 
 # Sample for saying something in French.
 .PHONY: say-fr
 say-fr:
-	gh -msg "Merci." -lang fr
+	gh -lang fr -msg "Merci."
 
 # Sample for saying by specific sound volume.
 .PHONY: say-en2
 say-en2:
-	gh -msg "Thank you." -vol 0.3
+	gh -vol 0.3 speak -msg "Thank you."
 
 
 # Sample for playing music.
 .PHONY: play-music
 play-music:
-	gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/asetts/music/bensound-dubstep.mp3"
+	gh music -file "https://raw.githubusercontent.com/hiromaily/go-google-home/master/asetts/music/bensound-dubstep.mp3"
 
 
 # Sample for using specific IP address of Google Home.
-.PHONY: play-music
-say-with_address:
-	gh -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
-
-
-# Sample for saying something in English with `debug` log.
-.PHONY: say-debug
-say-debug:
-	gh -msg "This displays debug log." -log 1
+.PHONY: say-with-address
+say-with-address:
+	gh -addr "10.0.0.1:8009" -msg "It reaches to specific IP address."
 
 
 ###############################################################################
@@ -114,7 +108,7 @@ say-debug:
 # Sample for server mode.
 .PHONY: server
 server:
-	gh -server
+	gh server
 
 # Sample to post message to server by HTTPie
 .PHONY: post-msg
