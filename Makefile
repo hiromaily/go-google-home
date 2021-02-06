@@ -128,7 +128,6 @@ release:
 .PHONY: brew-install
 brew-install:
 	brew install hiromaily/tap/go-google-home
-	# book-teacher
 
 brew-uninstall:
 	brew uninstall hiromaily/tap/go-google-home

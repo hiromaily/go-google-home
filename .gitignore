@@ -1,2 +1,6 @@
 .idea/
 .DS_Store
+
+# release
+dist/
+gh.toml
