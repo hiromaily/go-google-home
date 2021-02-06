@@ -60,7 +60,7 @@ func (d *device) Start(addr string) (Device, error) {
 	// discover Google Home
 	d.logger.Debug("discover google home address")
 	srv := d.serviceReceiver.Discover()
-	if srv.Error != nil {
+	if srv.Error == nil {
 		return d.WithService(srv).WithClient(), nil
 	}
 	return nil, srv.Error
