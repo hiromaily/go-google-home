@@ -60,6 +60,7 @@ func NewController(
 // Speak speaks text content
 func (c *controller) Speak(text string, language string) error {
 	playURL := fmt.Sprintf(ttsURL, url.QueryEscape(text), url.QueryEscape(language))
+	c.logger.Debug("speak", zap.String("playURL", playURL))
 	return c.Play(playURL)
 }
 

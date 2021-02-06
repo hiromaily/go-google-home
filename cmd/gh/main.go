@@ -85,7 +85,7 @@ func main() {
 		log.Fatalf("fail to connect Google Home: %v", err)
 		return
 	}
-	defer gh.Controller().Close()
+	defer gh.Close()
 
 	// volume TODO:Fix DATA RACE
 	if *volume != "" {

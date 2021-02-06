@@ -30,6 +30,7 @@ type Device interface {
 	WithClient() Device
 	Controller() controller.Controller
 	Error() error
+	Close()
 }
 
 type device struct {
@@ -140,4 +141,9 @@ func (d *device) Controller() controller.Controller {
 // Error returns error
 func (d *device) Error() error {
 	return d.err
+}
+
+// Close closes device
+func (d *device) Close() {
+	d.ctl.Close()
 }

@@ -53,7 +53,7 @@ build-version:
 
 .PHONY: run
 run:
-	go run -v ./cmd/gh/ -msg "Thank you."
+	go run -v ./cmd/gh/ -msg "My name is Hiroki. Nice to meet you. How's it going? Thank you."
 
 
 ###############################################################################
