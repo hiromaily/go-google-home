@@ -13,6 +13,7 @@ import (
 // ServiceServiceReceiver
 //-----------------------------------------------------------------------------
 
+// ServiceReceiver interface
 type ServiceReceiver interface {
 	Discover() *Service
 }
@@ -21,12 +22,14 @@ type serviceReceiver struct {
 	logger *zap.Logger
 }
 
+// NewServiceReceiver returns ServiceReceiver
 func NewServiceReceiver(logger *zap.Logger) ServiceReceiver {
 	return &serviceReceiver{
 		logger: logger,
 	}
 }
 
+// Service includes *mdns.ServiceEntry
 type Service struct {
 	Service *mdns.ServiceEntry
 	Error   error

@@ -44,6 +44,7 @@ type controller struct {
 	logger *zap.Logger
 }
 
+// NewController returns Controller
 func NewController(
 	ctx context.Context,
 	client *cast.Client,
@@ -125,7 +126,7 @@ func (c *controller) Close() {
 	c.client.Close()
 }
 
-// Close closes google cast client Events channel
+// CloseEvent closes google cast client Events channel
 func (c *controller) CloseEvent() {
 	close(c.client.Events)
 }

@@ -16,12 +16,11 @@ var (
 	tomlPath = flag.String("toml", "", "TOML file path")
 	message  = flag.String("msg", "", "Message to Google Home")
 	music    = flag.String("music", "", "URL of Music file")
-	// address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
-	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
-	lang       = flag.String("lang", "en", "Language to speak")
-	volume     = flag.String("vol", "", "Volume: 0.0-1.0")
-	server     = flag.Bool("server", false, "Run by server mode")
-	serverPort = flag.Int("port", 8080, "Server port")
+	address  = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
+	lang     = flag.String("lang", "en", "Language to speak")
+	volume   = flag.String("vol", "", "Volume: 0.0-1.0")
+	server   = flag.Bool("server", false, "Run by server mode")
+	//serverPort = flag.Int("port", 8080, "Server port")
 )
 
 var usage = `Usage: %s [options...]
@@ -40,7 +39,7 @@ See Makefile for examples.
 
 func parseFlag() {
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
+		fmt.Fprintf(os.Stderr, usage, os.Args[0])
 	}
 	flag.Parse()
 }

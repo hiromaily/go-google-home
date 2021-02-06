@@ -18,12 +18,12 @@ type registry struct {
 	logger *zap.Logger
 }
 
-// NewRegistry is to register regstry interface
+// NewRegistry return Registry interface
 func NewRegistry(conf *config.Root) Registry {
 	return &registry{conf: conf}
 }
 
-// NewBooker is to register for booker interface
+// NewDevicer return device.Device interface
 func (r *registry) NewDevicer() device.Device {
 	return device.NewDevice(
 		r.newLogger(),
