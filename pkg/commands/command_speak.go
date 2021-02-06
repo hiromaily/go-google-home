@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"flag"
+	"fmt"
 
 	"github.com/google/subcommands"
 	"go.uber.org/zap"
@@ -41,8 +42,13 @@ func (*speakCmd) Synopsis() string {
 	return "speak message"
 }
 
-func (*speakCmd) Usage() string {
-	return `usage: msg`
+func (c *speakCmd) Usage() string {
+	return fmt.Sprintf(`Usage: gh speak [options]... : %s
+ options:
+  -msg    mssage to speka
+ e.g. 
+  gh speak -msg "Hi nice to meet you. My name is Robin."
+`, c.Synopsis())
 }
 
 func (c *speakCmd) SetFlags(f *flag.FlagSet) {
@@ -51,8 +57,8 @@ func (c *speakCmd) SetFlags(f *flag.FlagSet) {
 
 func (c *speakCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	if c.message == "" {
-		c.logger.Warn("-msg is required")
-		return subcommands.ExitFailure
+		fmt.Println(c.Usage())
+		return subcommands.ExitUsageError
 	}
 	c.logger.Info("speaks", zap.String("msg", c.message))
 

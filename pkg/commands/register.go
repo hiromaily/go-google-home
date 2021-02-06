@@ -13,18 +13,9 @@ func Register(logger *zap.Logger, devicer device.Device, chFinishNotifier chan s
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
-	subcommands.Register(newSpeakCmd(logger, devicer, chFinishNotifier), "msg")
-	//subcommands.Register(newMusicCmd(devicer), "music")
-	//subcommands.Register(newServerCmd(devicer), "server")
+	subcommands.Register(newSpeakCmd(logger, devicer, chFinishNotifier), "speak")
+	subcommands.Register(newPlayCmd(logger, devicer, chFinishNotifier), "play")
+	//subcommands.Register(newServerCmd(logger, devicer), "server")
 
 	flag.Parse()
 }
-
-//func validateArguments() {
-//	// this pattern is not allowed
-//	if !*server && *message == "" && *music == "" {
-//		flag.Usage()
-//		os.Exit(1)
-//		return
-//	}
-//}

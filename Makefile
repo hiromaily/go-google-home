@@ -93,8 +93,7 @@ say-en2:
 # Sample for playing music.
 .PHONY: play-music
 play-music:
-	gh music -file "https://raw.githubusercontent.com/hiromaily/go-google-home/master/asetts/music/bensound-dubstep.mp3"
-
+	gh play -url "https://github.com/hiromaily/go-google-home/raw/master/assets/music/bensound-dubstep.mp3"
 
 # Sample for using specific IP address of Google Home.
 .PHONY: say-with-address
