@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/subcommands"
 	"go.uber.org/zap"
+
+	"github.com/hiromaily/go-google-home/pkg/device"
 )
 
 // base command
