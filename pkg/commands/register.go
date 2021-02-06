@@ -14,8 +14,17 @@ func Register(logger *zap.Logger, devicer device.Device, chFinishNotifier chan s
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
-	subcommands.Register(newSpeakCmd(logger, devicer, chFinishNotifier), "speak")
-	subcommands.Register(newPlayCmd(logger, devicer, chFinishNotifier), "play")
+	//subcommands.Register(newSpeakCmd(logger, devicer, chFinishNotifier), "speak")
+	subcommands.Register(
+		newWrapperCmd(logger, devicer, chFinishNotifier, newSpeakCmd(logger, devicer, chFinishNotifier)),
+		"speak",
+	)
+	//subcommands.Register(newPlayCmd(logger, devicer, chFinishNotifier), "play")
+	subcommands.Register(
+		newWrapperCmd(logger, devicer, chFinishNotifier, newPlayCmd(logger, devicer, chFinishNotifier)),
+		"play",
+	)
+
 	// subcommands.Register(newServerCmd(logger, devicer), "server")
 
 	flag.Parse()

@@ -73,11 +73,7 @@ func main() {
 	}
 
 	regi := NewRegistry(conf)
-	devicer, err := regi.NewDevicer().Start()
-	if err != nil {
-		log.Fatalf("fail to connect Google Home: %v", err)
-		return
-	}
+	devicer := regi.NewDevicer()
 
 	// volume TODO:Fix DATA RACE
 	//if *volume != "" {
@@ -86,17 +82,15 @@ func main() {
 
 	// wait events
 	chFinishNotifier := make(chan struct{})
-	var commandResult int
-	defer func() {
-		devicer.Close()
-		close(chFinishNotifier)
-		os.Exit(commandResult)
-	}()
+	//var commandResult int
+	//defer func() {
+	//	devicer.Close()
+	//	close(chFinishNotifier)
+	//	os.Exit(commandResult)
+	//}()
 
 	// register sub commands
 	commands.Register(regi.NewLogger(), devicer, chFinishNotifier)
 	// execute sub command
-	commandResult = int(subcommands.Execute(context.Background()))
-
-	<-chFinishNotifier
+	os.Exit(int(subcommands.Execute(context.Background())))
 }
