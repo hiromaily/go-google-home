@@ -63,10 +63,10 @@ func (s *serviceReceiver) Discover() *Service {
 					close(chEntry)
 					return
 				}
-			case <-time.After(5 * time.Second):
+			case <-time.After(30 * time.Second):
 				isDone = true
 				close(chEntry)
-				chNotifier <- &Service{Error: errors.Errorf("timeout for discovering devices")}
+				chNotifier <- &Service{Error: errors.Errorf("can't discover devices by timeout")}
 				return
 			}
 		}

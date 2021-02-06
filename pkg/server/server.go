@@ -11,7 +11,6 @@ package server
 //	"os/signal"
 //	"time"
 //
-//	lg "github.com/hiromaily/golibs/log"
 //)
 //
 //// StartServer is to start server mode

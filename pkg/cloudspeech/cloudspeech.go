@@ -11,8 +11,6 @@ package cloudspeech
 //	speech "cloud.google.com/go/speech/apiv1"
 //	"golang.org/x/net/context"
 //	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
-//
-//	lg "github.com/hiromaily/golibs/log"
 //)
 //
 //var audioPath = "~/work/audio.raw"

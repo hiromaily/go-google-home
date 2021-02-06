@@ -8,7 +8,6 @@ require (
 	github.com/bookerzzz/grok v0.0.0
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/hiromaily/golibs v0.0.0-20210204063745-0871eb35ec4b
 	github.com/micro/mdns v0.3.0
 	github.com/miekg/dns v1.1.38 // indirect
 	github.com/pkg/errors v0.9.1
