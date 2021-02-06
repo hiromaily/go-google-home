@@ -1,0 +1,6 @@
+
+[logger]
+service = "google-home"
+env = "custom" # dev, prod, custom :for only zap logger
+level = "debug" # debug, info, warn, error
+is_stacktrace = false

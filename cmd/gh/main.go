@@ -3,16 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
-	gglh "github.com/hiromaily/go-google-home/pkg/googlehome"
-	lg "github.com/hiromaily/golibs/log"
+	"github.com/pkg/errors"
+
+	"github.com/hiromaily/go-google-home/pkg/config"
+	"github.com/hiromaily/go-google-home/pkg/files"
 )
 
 var (
-	message = flag.String("msg", "", "Message to Google Home")
-	music   = flag.String("music", "", "URL of Music file")
-	//address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
+	tomlPath = flag.String("toml", "", "TOML file path")
+	message  = flag.String("msg", "", "Message to Google Home")
+	music    = flag.String("music", "", "URL of Music file")
+	// address    = flag.String("addr", os.Getenv("GOOGLE_HOME_IP"), "Address of Google Home (e.g. 192.168.x.x:8009)")
 	address    = flag.String("addr", "", "Address of Google Home (e.g. 192.168.x.x:8009)")
 	lang       = flag.String("lang", "en", "Language to speak")
 	volume     = flag.String("vol", "", "Volume: 0.0-1.0")
@@ -34,12 +38,19 @@ Options:
 See Makefile for examples.
 `
 
-func init() {
+func parseFlag() {
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, os.Args[0]))
 	}
 	flag.Parse()
 }
+
+//func checkVersion() {
+//	if *isVersion {
+//		fmt.Printf("%s %s\n", "book-teacher", version)
+//		os.Exit(0)
+//	}
+//}
 
 func validateArguments() {
 	// this pattern is not allowed
@@ -50,74 +61,70 @@ func validateArguments() {
 	}
 }
 
+func getConfig() *config.Root {
+	configPath := files.GetConfigPath(*tomlPath)
+	if configPath == "" {
+		log.Fatal(errors.New("config file is not found"))
+	}
+	log.Println("config file: ", configPath)
+	conf, err := config.NewConfig(configPath)
+	if err != nil {
+		panic(err)
+	}
+	return conf
+}
+
 func main() {
-	//validate
+	parseFlag()
 	validateArguments()
 
-	lg.InitializeLog(lg.DebugStatus, lg.TimeShortFile, "[Google-Home]", "", "hiromaily")
-
-	gh := createClient()
-	if gh.Error != nil {
-		lg.Errorf("fail to connect Google Home: %v", gh.Error)
+	conf := getConfig()
+	regi := NewRegistry(conf)
+	devicer := regi.NewDevicer()
+	gh, err := devicer.Start(*address)
+	if err != nil {
+		log.Fatalf("fail to connect Google Home: %v", err)
 		return
 	}
-	defer gh.Close()
+	defer gh.Controller().Close()
 
-	//volume TODO:Fix DATA RACE
+	// volume TODO:Fix DATA RACE
 	if *volume != "" {
-		gh.SetVolume(*volume)
+		gh.Controller().SetVolume(*volume)
 	}
 
 	// wait events
 	finishNotification := make(chan bool)
-	var err error
 
 	switch {
 	case *server:
 		// server mode
-		gh.StartServer(*serverPort, *lang)
+		// gh.StartServer(*serverPort, *lang)
 		return
 	case *message != "":
-		lg.Infof("speak: %s", *message)
-		gh.RunEventReceiver(finishNotification)
+		log.Printf("speak: %s", *message)
+		gh.Controller().RunEventReceiver(finishNotification)
 
 		// speak something
-		err = gh.Speak(*message, *lang)
+		err = gh.Controller().Speak(*message, *lang)
 	case *music != "":
-		lg.Infof("play: %s", *music)
-		gh.RunEventReceiver(finishNotification)
+		log.Printf("play: %s", *music)
+		gh.Controller().RunEventReceiver(finishNotification)
 
 		// play music
-		err = gh.Play(*music)
+		err = gh.Controller().Play(*music)
 	default:
 	}
 	if err != nil {
-		lg.Errorf("fail to speak/play: %v", err)
+		log.Printf("fail to speak/play: %v", err)
 		close(finishNotification)
-		close(gh.Client.Events)
+		gh.Controller().CloseEvent()
 		return
 	}
 
 	monitorStatus()
 
 	<-finishNotification
-}
-
-func createClient() *gglh.GoogleHome {
-	var gh *gglh.GoogleHome
-
-	//TODO: is it better to environment variable if existing?
-	//os.Getenv("GOOGLE_HOME_IP")
-	if *address != "" {
-		// create object from address
-		lg.Infof("from address: %s", *address)
-		gh = gglh.NewGoogleHome().WithAddressString(*address).WithClient()
-	} else {
-		// discover Google Home
-		lg.Info("discover google home address")
-		gh = gglh.DiscoverService().WithClient()
-	}
-	return gh
 }
 
 func monitorStatus() {

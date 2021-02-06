@@ -1,7 +1,20 @@
 
+CURRENTDIR=`pwd`
+modVer=$(shell cat go.mod | head -n 3 | tail -n 1 | awk '{print $2}' | cut -d'.' -f2)
+currentVer=$(shell go version | awk '{print $3}' | sed -e "s/go//" | cut -d'.' -f2)
+gitTag=$(shell git tag | head -n 1)
+
 ###############################################################################
 # Managing Dependencies
 ###############################################################################
+.PHONY: check-ver
+check-ver:
+	#echo $(modVer)
+	#echo $(currentVer)
+	@if [ ${currentVer} -lt ${modVer} ]; then\
+		echo go version ${modVer}++ is required but your go version is ${currentVer};\
+	fi
+
 .PHONY: update
 update:
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -11,44 +24,32 @@ update:
 ###############################################################################
 # Golang formatter and detection
 ###############################################################################
-.PHONY: lint
-lint:
-	golangci-lint run --fix
-
 .PHONY: imports
 imports:
 	./scripts/imports.sh
 
+.PHONY: lint
+lint:
+	golangci-lint run --fix
+
+.PHONY: lintall
+lintall: imports lint
+
+
 ###############################################################################
 # Build
 ###############################################################################
-.PHONY: run
-run:
-	go run -v ./cmd/ -msg "Thank you."
-
 .PHONY: build
 build:
-	go build -v -o ${GOPATH}/bin/gh ./cmd/
+	go build -v -o ${GOPATH}/bin/gh ./cmd/gh/
 
-.PHONY: build-mac
-build-mac: GOOS=darwin GOARCH=amd64
-build-mac:
-	go build -v -o ./cmd/releases/darwin_amd64/gh ./cmd/
+.PHONY: build-version
+build-version:
+	go build -ldflags "-X main.version=${gitTag}" -v -o ${GOPATH}/bin/gh ./cmd/gh/
 
-.PHONY: build-linux
-build-linux: GOOS=linux
-build-linux:
-	#GOOS=linux go build -v -o ./releases/linux_amd64/gh ./cmd/
-	go build -v -o ./cmd/releases/linux_amd64/gh ./cmd/
-
-.PHONY: build-linux-arm
-build-linux-arm: GOOS=linux GOARCH=arm GOARM=5
-build-linux-arm:
-	#GOOS=linux GOARCH=arm GOARM=5 go build -v -o ./releases/linux_arm/gh ./cmd/
-	go build -v -o ./cmd/releases/linux_arm/gh ./cmd/
-
-.PHONY: release-all
-release-all: build-linux build-linux-arm build-mac
+.PHONY: run
+run:
+	go run -v ./cmd/gh/ -msg "Thank you."
 
 
 ###############################################################################
