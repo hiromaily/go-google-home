@@ -82,12 +82,6 @@ func main() {
 
 	// wait events
 	chFinishNotifier := make(chan struct{})
-	//var commandResult int
-	//defer func() {
-	//	devicer.Close()
-	//	close(chFinishNotifier)
-	//	os.Exit(commandResult)
-	//}()
 
 	// register sub commands
 	commands.Register(regi.NewLogger(), devicer, chFinishNotifier)

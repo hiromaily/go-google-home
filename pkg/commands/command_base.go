@@ -3,10 +3,10 @@ package commands
 import (
 	"context"
 	"flag"
-	"github.com/google/subcommands"
-	"github.com/hiromaily/go-google-home/pkg/device"
-	"go.uber.org/zap"
 	"os"
+
+	"github.com/google/subcommands"
+	"go.uber.org/zap"
 )
 
 // base command
@@ -55,11 +55,13 @@ func (w *wrapperCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...inter
 
 	defer func() {
 		w.devicer.Close()
-		//close(w.chFinishNotifier)
 	}()
 
 	// execute
 	exitStatus := w.Command.Execute(ctx, f, args...)
+	if exitStatus != subcommands.ExitSuccess {
+		close(w.chFinishNotifier)
+	}
 	w.logger.Debug("exitStatus", zap.Int("exitStatus", int(exitStatus)))
 
 	// wait

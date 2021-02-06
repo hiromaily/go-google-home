@@ -57,8 +57,6 @@ func (c *speakCmd) SetFlags(f *flag.FlagSet) {
 func (c *speakCmd) Execute(ctx context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	if c.message == "" {
 		fmt.Println(c.Usage())
-		//c.chFinishNotifier <- struct{}{}
-		close(c.chFinishNotifier)
 		return subcommands.ExitUsageError
 	}
 	c.logger.Info("speaks", zap.String("msg", c.message))
