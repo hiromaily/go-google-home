@@ -22,6 +22,7 @@ func (s *mockMDNSService) Records(q dns.Question) []dns.RR {
 		},
 	}
 }
+
 func (s *mockMDNSService) Announcement() []dns.RR {
 	return []dns.RR{
 		&dns.PTR{
@@ -35,6 +36,7 @@ func (s *mockMDNSService) Announcement() []dns.RR {
 		},
 	}
 }
+
 func TestDNSSDServiceRecords(t *testing.T) {
 	s := &DNSSDService{
 		MDNSService: &MDNSService{

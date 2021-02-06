@@ -1,8 +1,9 @@
 package main
 
 import (
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-google-home/pkg/config"
 	"github.com/hiromaily/go-google-home/pkg/device"

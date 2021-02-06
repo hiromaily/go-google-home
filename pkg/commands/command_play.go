@@ -11,7 +11,7 @@ import (
 	"github.com/hiromaily/go-google-home/pkg/device"
 )
 
-// playCmd defines args
+// playCmd defines play command
 type playCmd struct {
 	logger           *zap.Logger
 	devicer          device.Device

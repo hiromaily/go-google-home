@@ -4,6 +4,7 @@ run:
     - integration
   skip-dirs:
     - vendor
+    - pkg/mdns
 
 linters-settings:
   misspell:

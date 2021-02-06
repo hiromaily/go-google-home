@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -18,27 +19,32 @@ var (
 	tomlPath = flag.String("toml", "", "TOML file path")
 	addr     = flag.String("addr", "", "device address")
 	lang     = flag.String("lang", "", "language to speak")
-	volume   = flag.String("vol", "", "volume: 0.0-1.0")
+	// volume    = flag.String("vol", "", "volume: 0.0-1.0")
+	isVersion = flag.Bool("v", false, "version")
+
+	version string
 )
 
-//var usage = `Usage: %s [options...]
-//Options:
+// var usage = `Usage: %s [options...]
+// Options:
 //  -toml  TOML file path
 //  -addr  device address
 //  -lang  language to speak e.g.) en, de, nl, fr, ja ...
 //  -vol   volume: 0.0-1.0   e.g.) 0.5
+//  -v     show version
+
 //`
 
 func parseFlag() {
 	flag.Parse()
 }
 
-//func checkVersion() {
-//	if *isVersion {
-//		fmt.Printf("%s %s\n", "gh", version)
-//		os.Exit(0)
-//	}
-//}
+func checkVersion() {
+	if *isVersion {
+		fmt.Printf("%s %s\n", "gh", version)
+		os.Exit(0)
+	}
+}
 
 func getConfig() *config.Root {
 	configPath := files.GetConfigPath(*tomlPath)
@@ -55,6 +61,7 @@ func getConfig() *config.Root {
 
 func main() {
 	parseFlag()
+	checkVersion()
 
 	conf := getConfig()
 	// overwrite config

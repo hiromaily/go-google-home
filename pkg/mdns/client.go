@@ -151,7 +151,7 @@ func Listen(entries chan<- *ServiceEntry, exit chan struct{}) error {
 		}
 	}
 
-	//return nil
+	// return nil
 }
 
 // Lookup is the same as Query, however it uses all the default parameters
@@ -279,7 +279,7 @@ func (c *client) Close() error {
 	return nil
 }
 
-// setInterface is used to set the query interface, uses sytem
+// setInterface is used to set the query interface, uses system
 // default if not provided
 func (c *client) setInterface(iface *net.Interface, loopback bool) error {
 	p := ipv4.NewPacketConn(c.ipv4UnicastConn)

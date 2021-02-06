@@ -11,12 +11,11 @@ import (
 	"github.com/hiromaily/go-google-home/pkg/device"
 )
 
-// speakCmd defines args
+// speakCmd defines speak command
 type speakCmd struct {
 	logger           *zap.Logger
 	devicer          device.Device
 	chFinishNotifier chan struct{}
-	lang             string
 
 	// args
 	message string
