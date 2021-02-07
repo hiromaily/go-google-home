@@ -22,26 +22,45 @@ import (
 
 // Server interface
 type Server interface {
-	Start(port int)
+	Start(port int) error
 	SpeakHandler() func(http.ResponseWriter, *http.Request)
 }
 
 // server object
 type server struct {
-	logger  *zap.Logger
-	devicer device.Device
+	logger      *zap.Logger
+	devicer     device.Device
+	defaultPort int
 }
 
 // NewServer returns Server
-func NewServer(logger *zap.Logger, devicer device.Device) Server {
+func NewServer(logger *zap.Logger, devicer device.Device, defaultPort int) Server {
 	return &server{
-		logger:  logger,
-		devicer: devicer,
+		logger:      logger,
+		devicer:     devicer,
+		defaultPort: defaultPort,
 	}
 }
 
 // Start starts server
-func (s *server) Start(port int) {
+func (s *server) Start(port int) error {
+	if port == 0 {
+		port = s.defaultPort
+	}
+
+	// device
+	_, err := s.devicer.Start()
+	if err != nil {
+		s.logger.Error("fail to call devicer.Start()", zap.Error(err))
+		return err
+	}
+	defer func() {
+		s.devicer.Close()
+	}()
+	// set callback event
+	s.devicer.Controller().RunEventReceiver(nil)
+
+	// signal
 	stopCh := make(chan os.Signal, 1)
 	signal.Notify(stopCh, os.Interrupt)
 	defer signal.Stop(stopCh)
@@ -50,9 +69,9 @@ func (s *server) Start(port int) {
 	http.HandleFunc("/speak", s.SpeakHandler())
 	// http.Handle("/ssml/", http.StripPrefix("/ssml/", http.FileServer(http.Dir("./ssml"))))
 
+	// server
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: http.DefaultServeMux}
 	s.logger.Info("Server start", zap.Int("port", port))
-
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil {
@@ -67,8 +86,8 @@ func (s *server) Start(port int) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	srv.Shutdown(ctx)
 	s.logger.Info("server gracefully stopped")
+	return srv.Shutdown(ctx)
 }
 
 // SpeakHandler handles /speak

@@ -74,6 +74,7 @@ func main() {
 
 	regi := NewRegistry(conf)
 	devicer := regi.NewDevicer()
+	server := regi.NewServer()
 
 	// volume TODO:Fix DATA RACE
 	//if *volume != "" {
@@ -84,7 +85,7 @@ func main() {
 	chFinishNotifier := make(chan struct{})
 
 	// register sub commands
-	commands.Register(regi.NewLogger(), devicer, chFinishNotifier)
+	commands.Register(regi.NewLogger(), server, devicer, chFinishNotifier)
 	// execute sub command
 	os.Exit(int(subcommands.Execute(context.Background())))
 }

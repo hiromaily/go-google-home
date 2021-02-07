@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 
+	"github.com/hiromaily/go-google-home/pkg/server"
+
 	"github.com/google/subcommands"
 	"go.uber.org/zap"
 
@@ -10,7 +12,7 @@ import (
 )
 
 // Register registers sum commands
-func Register(logger *zap.Logger, devicer device.Device, chFinishNotifier chan struct{}) {
+func Register(logger *zap.Logger, server server.Server, devicer device.Device, chFinishNotifier chan struct{}) {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
@@ -25,7 +27,7 @@ func Register(logger *zap.Logger, devicer device.Device, chFinishNotifier chan s
 		"play",
 	)
 
-	// subcommands.Register(newServerCmd(logger, devicer), "server")
+	subcommands.Register(newServerCmd(logger, server), "server")
 
 	flag.Parse()
 }

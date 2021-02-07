@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/hiromaily/go-google-home/pkg/server"
+
 	"go.uber.org/zap"
 
 	"github.com/hiromaily/go-google-home/pkg/config"
@@ -13,11 +15,13 @@ import (
 // Registry interface
 type Registry interface {
 	NewDevicer() device.Device
+	NewServer() server.Server
 	NewLogger() *zap.Logger
 }
 
 type registry struct {
 	conf   *config.Root
+	server device.Device
 	logger *zap.Logger
 }
 
@@ -28,11 +32,23 @@ func NewRegistry(conf *config.Root) Registry {
 
 // NewDevicer return device.Device interface
 func (r *registry) NewDevicer() device.Device {
-	return device.NewDevice(
+	if r.server == nil {
+		r.server = device.NewDevice(
+			r.NewLogger(),
+			r.newServiceReceiver(),
+			r.conf.Device.Address,
+			r.conf.Device.Lang,
+		)
+	}
+	return r.server
+}
+
+// NewDevicer returns device.Device interface
+func (r *registry) NewServer() server.Server {
+	return server.NewServer(
 		r.NewLogger(),
-		r.newServiceReceiver(),
-		r.conf.Device.Address,
-		r.conf.Device.Lang,
+		r.NewDevicer(),
+		r.conf.Server.Port,
 	)
 }
 
