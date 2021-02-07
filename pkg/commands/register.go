@@ -26,7 +26,6 @@ func Register(logger *zap.Logger, server server.Server, devicer device.Device, c
 		newWrapperCmd(logger, devicer, chFinishNotifier, newPlayCmd(logger, devicer, chFinishNotifier)),
 		"play",
 	)
-
 	subcommands.Register(newServerCmd(logger, server), "server")
 
 	flag.Parse()

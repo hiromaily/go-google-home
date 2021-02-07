@@ -31,7 +31,7 @@ func newServerCmd(
 }
 
 func (*serverCmd) Name() string {
-	return "play"
+	return "server"
 }
 
 func (*serverCmd) Synopsis() string {
