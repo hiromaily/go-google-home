@@ -59,46 +59,40 @@ run:
 ###############################################################################
 # Execute
 ###############################################################################
-# Sample for saying something in English.
+# saying something in English
 .PHONY: say-en
 say-en:
 	gh speak -msg "Thank you."
 
-# Sample for saying something in Japanese.
+# saying something in Japanese.
 .PHONY: say-ja
 say-ja:
-	gh speak -msg "ありがとうございます" -lang ja
+	gh -lang ja speak -msg "ありがとうございます"
 
-# Sample for saying something in Dutch.
+# saying something in Dutch.
 .PHONY: say-nl
 say-nl:
 	gh -lang nl speak -msg "Dank je"
 
-# Sample for saying something in German.
+# saying something in German.
 .PHONY: say-de
 say-de:
 	gh -lang de speak -msg "Danke."
 
-# Sample for saying something in French.
+# saying something in French.
 .PHONY: say-fr
 say-fr:
-	gh -lang fr -msg "Merci."
+	gh -lang fr speak -msg "Merci."
 
-# Sample for saying by specific sound volume.
-.PHONY: say-volume
-say-volume:
-	gh -vol 0.3 speak -msg "Thank you."
-
-
-# Sample for playing music.
+# playing music
 .PHONY: play-music
 play-music:
 	gh play -url "https://github.com/hiromaily/go-google-home/raw/master/assets/music/bensound-dubstep.mp3"
 
-# Sample for using specific IP address of Google Home.
+# using specific IP address of Google Home.
 .PHONY: say-with-address
 say-with-address:
-	gh -addr "10.0.0.1:8009" -msg "It reaches to specific IP address."
+	gh -addr "xxx.xxx.xxx.xxx:8009" -msg "It reaches to specific IP address."
 
 
 ###############################################################################

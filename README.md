@@ -7,70 +7,85 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/hiromaily/go-goa/master/LICENSE)
 
 
-It makes Google Home spoken something and is inspired by 
-[google-home-notifier](https://github.com/noelportugal/google-home-notifier).  
-There are 2 modes.
-- command line interface with text parameter.
-- server mode handling HTTP post message.
-- [WIP] playing music functionality is still ongoing.
+It makes Google Home spoken something and is inspired by [google-home-notifier](https://github.com/noelportugal/google-home-notifier).  
+There are 3 modes.
+- speak message
+- play sound data
+- run as server mode then POST message with message can be handled to speak  
+
+### Note
+- Google Home device should be in same local network with machine
+- Google Home device IP address would be detected automatically. So it's not necessarily to specify device IP address.
 
 
-## command line option
-| Options        |                                           | Type   | Example                    |
-| -------------- | ------------------------------------------ | -------| ------------------------- |
-| msg            | Message to Google Home                     | string | "Hello world!"            |
-| music          | URL of music file to play on Google Home   | string | "http://music.com/aa.mp3" |
-| addr           | IP address + Port for specific Google Home | string | "xxx.xxx.xxx.xxx:8009"    |
-| lang           | Language to speak                          | string | en                        |
-| vol            | Volume                                     | string | 0.3                       |
-| server         | Run by server mode                         | bool   | none                      |
-| port           | Web Server port                            | int    | 8080                      |
-| log            | Log level, `1` displays even debug message | int    | 1                         |
+## Requirements
+- Golang 1.15+
+- [direnv](https://github.com/direnv/direnv) for MacOS user
+- [Ngrok](https://github.com/inconshreveable/ngrok) if you want to access server from outside
 
-- GoogleHome IP address would be detected automatically. So it's not necessarily to run with specific IP address.
-- Environment variable `GOOGLE_HOME_IP` is used for GoogleHome IP address.
-
-
-## Execution example
+## Installation
+### for MacOS user
 ```
-# Build
-$ go build -i -v -o ${GOPATH}/bin/gh ./cmd/
+$ brew install hiromaily/tap/go-google-home
+ 
+# config file is installed in /usr/local/etc/google-home/gh.toml
+# modify `gh.toml` if settings wanna be changed
 
-# Sample for saying something in English.
-$ gh -msg "Thank you." -lang en
-
-# Sample for saying something in Japanese.
-$ gh -msg "ありがとうございます" -lang ja
-
-# Sample for saying something in Dutch.
-$ gh -msg "Dank je" -lang nl
-
-# Sample for saying something in German.
-$ gh -msg "Danke." -lang de
-
-# Sample for saying something in French.
-$ gh -msg "Merci." -lang fr
-
-# Sample for saying by specific sound volume.
-$ gh -msg "Thank you." -vol 0.3
-
-# Sample for saying something in English with `debug` log.
-$ gh -msg "This displays debug log." -log 1
-
-# Sample for using specific IP address of Google Home.
-$ gh  -msg "It reaches to specific IP address." -addr "10.0.0.1:8009"
-
-
-# Sample for playing music.
-$ gh -music "https://raw.githubusercontent.com/hiromaily/go-google-home/master/music/bensound-dubstep.mp3"
+# run
+$ gh speak -msg "Hi guys, thank you for using. Have fun."
 ```
 
-## run as server
-```
-# Sample for server mode.
-$ gh -server
 
-# Sample to post message to server by HTTPie
+## subcommand
+| subcommand   |                                                    | example                        |
+| ------------ | -------------------------------------------------- | ------------------------------ |
+| speak        | speak message on google home                       | gh speak -msg "hello guys"     |
+| play         | play sound data on google home                     | gh play -url xxxxx.mp3         |
+| server       | run web server to handle http request with message | gh server -port 8888           |
+
+
+## basic command line option
+| options        |                                            | type   | example                      |
+| -------------- | ------------------------------------------ | -------| ---------------------------- |
+| toml           | TOML file path                             | string | -toml ./configs/default.toml |
+| addr           | specify address of Google Homee            | string | -addr xxx.xxx.xxx.xxx:8009   |
+| lang           | spoken language, default is english        | string | -lang en                     |
+| v              | show version                               | bool   | -v                           |
+
+## environment variable
+environment variable `GO_GOOGLE_HOME_CONF` is used as default config path
+
+
+## example
+```
+# saying something in English
+$ gh speak -msg "Thank you."
+
+# saying something in Japanese
+$ gh -lang ja speak -msg "ありがとうございます"
+
+# saying something in Dutch
+$ gh -lang nl speak -msg "Dank je" 
+
+# saying something in German
+$ gh -lang de speak -msg "Danke."
+
+# saying something in French
+$ gh -lang fr speak -msg "Merci."
+
+# playing music
+$ gh play -url "https://github.com/hiromaily/go-google-home/raw/master/assets/music/bensound-dubstep.mp3"
+
+# using specific IP address of Google Home.
+$ gh -addr "10.0.0.1:8009" -msg "It reaches to specific IP address."
+```
+
+## example as server
+```
+# server mode
+$ gh server -port 8888
+
+# then post message to server by HTTPie
 $ http POST http://localhost:8080/speak text="It's sunny day today."
 ```
 
@@ -80,13 +95,10 @@ Use [Ngrok](https://github.com/inconshreveable/ngrok)
 
 #### Install on Mac
 ```
-$ brew cask install ngrok
+$ brew install --cask ngrok
 ```
+
 ```
 # If you use 8080 port for that local server.
 $ ngrok http 8080
 ```
-
-
-## Special Thanks
-Using sample music from [https://www.bensound.com](https://www.bensound.com/royalty-free-music/electronica) as royalty-free.
