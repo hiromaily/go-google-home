@@ -74,7 +74,7 @@ func (s *server) Start(port int) error {
 	s.logger.Info("Server start", zap.Int("port", port))
 	go func() {
 		// service connections
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.logger.Error("fail to call ListenAndServe()", zap.Error(err))
 			return
 		}
