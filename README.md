@@ -89,7 +89,14 @@ $ gh server -port 8888
 $ http POST http://localhost:8080/speak text="It's sunny day today."
 ```
 
-
+## [WIP] send messages from Slack channel by integration
+1. create new App `google-home `from [slack apps](https://api.slack.com/apps)
+2. [Basic Information]-[Building Apps for Slack]-[Add features and functionality]
+    - add `Bots` => Display Name (Bot Name): `googlebot`
+    - and `Permissions`
+3. [Basic Information]-[Building Apps for Slack]-[Install your app]
+4. Outgoing Webhooks
+   
 ## How to access to local server from outside easily?
 Use [Ngrok](https://github.com/inconshreveable/ngrok)
 
