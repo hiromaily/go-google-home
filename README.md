@@ -90,12 +90,14 @@ $ http POST http://localhost:8080/speak text="It's sunny day today."
 ```
 
 ## [WIP] send messages from Slack channel by integration
-1. create new App `google-home `from [slack apps](https://api.slack.com/apps)
-2. [Basic Information]-[Building Apps for Slack]-[Add features and functionality]
-    - add `Bots` => Display Name (Bot Name): `googlebot`
-    - and `Permissions`
-3. [Basic Information]-[Building Apps for Slack]-[Install your app]
-4. Outgoing Webhooks
+### setup Google Apps Script
+1. create http endpoint from Slack using [Google Apps Script](https://developers.google.com/apps-script/guides/web)
+   - script is [server.gs](https://github.com/hiromaily/go-google-home/blob/master/scripts/google_apps_script/server.gs)
+2. deploy it and get endpoint URL
+
+### setup Slack
+1. create new App `google-home `from [slack apps](https://api.slack.com/apps) on your slack workspace
+2. use [Slack Events API](https://api.slack.com/apis/connections/events-api)
    
 ## How to access to local server from outside easily?
 Use [Ngrok](https://github.com/inconshreveable/ngrok)

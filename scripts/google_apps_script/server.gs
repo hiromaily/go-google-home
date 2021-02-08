@@ -1,27 +1,40 @@
-//For Slack
+// For Slack
+// https://api.slack.com/events/url_verification
+// https://developers.google.com/apps-script/guides/web
+//
+// [POST]
+// "body": {
+// 	 "type": "url_verification",
+// 	 "token": "xxxxxxxxxxxxxx",
+// 	 "challenge": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+// }
 function doPost(e) {
     console.log("doPost");
-    var token = "your_slack_token";
+    const token = "your_slack_token";
 
+    // validate token
     if (token != e.parameter.token) {
         return;
     }
-    var text = e.parameter.text.replace(/<@[a-zA-Z0-9].*?>/, '').slice(0, 50);
-    return request(text);
+    // request
+    const text = e.parameter.text.replace(/<@[a-zA-Z0-9].*?>/, '').slice(0, 50);
+    request(text);
+
+    // response
+    return HtmlService.createHtmlOutput(e.parameter.challenge);
 }
 
-//For Test
+// For Test
 function doGet(e) {
     var params = JSON.stringify(e);
-    //return HtmlService.createHtmlOutput(params);
     return ContentService.createTextOutput(JSON.stringify(params))
         .setMimeType(ContentService.MimeType.JSON);
 }
 
 function request(text) {
     console.log("request");
-    var googleHomeURL = 'https://xxxxx.ngrok.io/google-home-notifier';
-    var urlFetchOption = {
+    const googleHomeURL = 'https://xxxxx.ngrok.io/google-home-notifier';
+    const urlFetchOption = {
         'method' : 'post',
         'contentType' : 'application/x-www-form-urlencoded',
         'payload' : { 'text' : text}
