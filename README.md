@@ -11,17 +11,17 @@ It makes Google Home spoken something and is inspired by [google-home-notifier](
 There are 3 modes.
 - speak message
 - play sound data
-- run as server mode then POST message with message can be handled to speak  
+- run as server mode then http request with messages can be handled to speak  
 
 ### Note
-- Google Home device should be in same local network with machine
+- Google Home device should be in same local network with installed machine
 - Google Home device IP address would be detected automatically. So it's not necessarily to specify device IP address.
 
 
 ## Requirements
 - Golang 1.15+
-- [direnv](https://github.com/direnv/direnv) for MacOS user
-- [Ngrok](https://github.com/inconshreveable/ngrok) if you want to access server from outside
+- [direnv](https://github.com/direnv/direnv) for MacOS user under development
+- [Ngrok](https://github.com/inconshreveable/ngrok) if you want to access installed machine from outside
 
 ## Installation
 ### for MacOS user
@@ -52,7 +52,7 @@ $ gh speak -msg "Hi guys, thank you for using. Have fun."
 | lang           | spoken language, default is english        | string | -lang en                     |
 | v              | show version                               | bool   | -v                           |
 
-## environment variable
+## environment variable for development
 environment variable `GO_GOOGLE_HOME_CONF` is used as default config path
 
 
