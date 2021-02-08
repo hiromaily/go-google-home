@@ -26,7 +26,7 @@ update:
 ###############################################################################
 .PHONY: imports
 imports:
-	./scripts/imports.sh
+	./scripts/sh/imports.sh
 
 .PHONY: lint
 lint:
