@@ -69,6 +69,9 @@ func (s *server) Start(port int) error {
 	http.HandleFunc("/speak", s.SpeakHandler())
 	// http.Handle("/ssml/", http.StripPrefix("/ssml/", http.FileServer(http.Dir("./ssml"))))
 
+	// handler
+	http.HandleFunc("/play", s.PlayHandler())
+
 	// server
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: http.DefaultServeMux}
 	s.logger.Info("Server start", zap.Int("port", port))
@@ -88,6 +91,50 @@ func (s *server) Start(port int) error {
 
 	s.logger.Info("server gracefully stopped")
 	return srv.Shutdown(ctx)
+}
+
+// PlayHandler handles /play
+func (s *server) PlayHandler() func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// check post or not
+		if r.Method != "POST" {
+			http.Error(w, "Method is not allowed.", http.StatusMethodNotAllowed)
+			return
+		}
+		// check parameter in json
+		url, err := parseJSON(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			s.logger.Error("fail to call parseJson()", zap.Error(err))
+			return
+		}
+
+		err = s.play(w, url)
+		if err != nil {
+			return
+		}
+		s.logger.Info("play", zap.String("message", url))
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, url)
+	}
+}
+
+func (s *server) play(w http.ResponseWriter, url string) error {
+	if url == "" {
+		msg := "url parameter is invalid"
+		http.Error(w, msg, http.StatusBadRequest)
+		s.logger.Error(msg)
+		return errors.New(msg)
+	}
+	err := s.devicer.Controller().Play(url)
+	if err != nil {
+		msg := "fail to call Play()"
+		http.Error(w, msg, http.StatusInternalServerError)
+		s.logger.Error(msg, zap.Error(err))
+		return err
+	}
+	return nil
 }
 
 // SpeakHandler handles /speak
@@ -119,7 +166,7 @@ func (s *server) SpeakHandler() func(http.ResponseWriter, *http.Request) {
 
 func (s *server) speak(w http.ResponseWriter, text string) error {
 	if text == "" {
-		msg := "test parameter is invalid"
+		msg := "text parameter is invalid"
 		http.Error(w, msg, http.StatusBadRequest)
 		s.logger.Error(msg)
 		return errors.New(msg)
